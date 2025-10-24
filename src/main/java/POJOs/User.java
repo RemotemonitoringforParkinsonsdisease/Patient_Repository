@@ -5,8 +5,7 @@ public class User {
     private String password; //TODO: Encriptar
     private String role;
     private Integer userId;
-    //IMPORTANTE: El id puede ser tanto de Doctor como de Paciente dependiendo del rol, por lo que podríamos hacerlo como String, y añadir una letra delante (P/D)
-    //Otra forma para mantenerlo como int es tener un id diferente de usuario al de paciente/doctor
+    //Yo haría que Patient y Doctor hereden de User, así no hay que andar pasando User como atributo
     public User(String email, String password, String role) {
         this.email = email;
         this.password = password;

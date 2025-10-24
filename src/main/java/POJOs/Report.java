@@ -1,9 +1,9 @@
 package POJOs;
+
 import java.time.LocalDate;
 import java.util.Set;
 
-public class Report { //Cuando un paciente manda un report al doctor, hay q ver si el doctor se comunica a través del mismo report
-
+public class Report {
     private Integer reportId;
     private Integer patientId;
     private Integer doctorId;
