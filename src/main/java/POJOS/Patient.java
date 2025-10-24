@@ -13,6 +13,6 @@ public class Patient extends User{
         super(email, fullName);
         this.password = password;
         this.dob = dob;
-    }
+    } //TODO: Asignar Doctor automaticamente al crear paciente
 }
 
