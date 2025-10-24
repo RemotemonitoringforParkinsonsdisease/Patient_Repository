@@ -1,4 +1,4 @@
-package POJOs;
+package POJOS;
 
 import java.time.LocalDate;
 import java.util.Set;
