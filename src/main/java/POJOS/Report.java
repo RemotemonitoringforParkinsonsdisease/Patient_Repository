@@ -1,34 +1,42 @@
 package POJOS;
 
 import java.time.LocalDate;
+import java.util.Random;
 import java.util.Set;
 
 public class Report {
-    private Integer reportId;
+    private String reportId;
     private Integer patientId;
     private Integer doctorId;
     private LocalDate reportDate;
-    private String patientText; //El texto que le manda el paciente al doctor
-    private String symptoms; //Sintomas de una lista cerrada
+    private String patientObservation;//El texto que le manda el paciente al doctor
+    private String doctorObservation;
+    private Set<Symptoms> symptoms; //Sintomas de una lista cerrada
     private Set<Signal> signals; //La señal grabada por el bitalino del paciente, supongo que seran varios canales, puede ser un Set / List de String, hay que mirar tipo de datos del Bitalino
-    //TODO: Hacer clase señal
-    public Report(Integer patientId, Integer doctorId, LocalDate reportDate, String patientText) { //Report solo con texto
+
+    public Report(String reportId, Integer patientId, Integer doctorId, LocalDate reportDate, String patientObservation, String doctorObservation, Set<Symptoms> symptoms, Set<Signal> signals) {
+        this.reportId = reportId;
         this.patientId = patientId;
         this.doctorId = doctorId;
         this.reportDate = reportDate;
-        this.patientText = patientText;
-    }
-    public Report(Integer patientId, Integer doctorId, LocalDate reportDate, Set<Signal> signals) { //Report solo con señal
-        this.patientId = patientId;
-        this.doctorId = doctorId;
-        this.reportDate = reportDate;
+        this.patientObservation = patientObservation;
+        this.doctorObservation = doctorObservation;
+        this.symptoms = symptoms;
         this.signals = signals;
     }
-    public Report(Integer patientId, Integer doctorId, LocalDate reportDate, String patientText, String signal) { //Report con ambas
-        this.patientId = patientId;
-        this.doctorId = doctorId;
-        this.reportDate = reportDate;
-        this.patientText = patientText;
-    }
 
+    /*
+    public String createReportId() {
+        String identifier = "R";
+        final int idLength = 9;
+        for (int i = 0; i < idLength; i++) {
+            Random rand = new Random();
+            identifier += rand.nextInt(10);
+        }
+        if(idList.contains(identifier)){
+            return createId();
+        }
+        return identifier;
+    }
+     */
 }

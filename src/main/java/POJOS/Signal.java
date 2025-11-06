@@ -4,4 +4,5 @@ public class Signal {
     private String signalId;
     private SignalType signalType;
     private String[] values;
+    private final int samplingRate = 100;
 }
