@@ -10,11 +10,24 @@ public class User {
     private String email;
     private String fullName;
 
+    //Constructor para REGISTRO
     public User(String email, String fullName) {
         this.email = email;
         this.fullName = fullName;
         this.id = createId();
         idList.add(id);
+    }
+
+    //Constructor de USER completo
+    public User(String id, String email, String fullName) {
+        this.email = email;
+        this.fullName = fullName;
+        this.id = id;
+    }
+
+    // Constructor para LOGIN (aún no sabemos ni id ni fullName)
+    public User(String email) {
+        this.email = email;
     }
 
     private String createId(){
@@ -29,6 +42,4 @@ public class User {
         }
         return identifier;
     }
-
-
 }
