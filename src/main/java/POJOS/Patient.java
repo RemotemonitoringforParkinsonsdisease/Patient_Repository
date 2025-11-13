@@ -9,9 +9,12 @@ public class Patient extends User{
     private LocalDate dob;
     private Set <Report> reports;
 
-    public Patient(String email, String password, String fullName, LocalDate dob) {
+    public Patient(String email, String password, String fullName, LocalDate dob, Doctor doctor, Set <Report> reports) {
         super(email, fullName);
         this.dob = dob;
+        this.password = password;
+        this.doctor = doctor;
+        this.reports = reports;
     }
 }
 
