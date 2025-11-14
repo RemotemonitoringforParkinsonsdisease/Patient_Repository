@@ -2,7 +2,6 @@ package manageData;
 
 import POJOS.Patient;
 
-import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
@@ -10,7 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SendDataViaNetwork {
-    private DataOutput dataOutputStream;
+    private DataOutputStream dataOutputStream;
 
     public SendDataViaNetwork(Socket socket) {
         try{
@@ -49,7 +48,7 @@ public class SendDataViaNetwork {
                 dataOutputStream.close();
             }
         } catch (IOException ex) {
-            System.err.println("Error al liberar recursos: " + ex.getMessage());
+            System.err.println("Error releasing resources: " + ex.getMessage());
             Logger.getLogger(SendDataViaNetwork.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
