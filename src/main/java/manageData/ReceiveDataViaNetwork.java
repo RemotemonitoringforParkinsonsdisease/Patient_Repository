@@ -2,6 +2,7 @@ package manageData;
 
 import POJOS.Doctor;
 import POJOS.Patient;
+import POJOS.Report;
 
 import java.io.DataInputStream;
 import java.io.EOFException;
@@ -9,6 +10,8 @@ import java.io.IOException;
 import java.net.Socket;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ReceiveDataViaNetwork {
 
@@ -31,21 +34,22 @@ public class ReceiveDataViaNetwork {
 
     public Doctor receiveDoctor() throws IOException{
         Doctor doctor = null;
-        int id = dataInputStream.readInt();
-        String name = dataInputStream.readUTF();
-        String surname = dataInputStream.readUTF();
-        String date = dataInputStream.readUTF();
+        String fullName = dataInputStream.readUTF();
         String email = dataInputStream.readUTF();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate dob = LocalDate.parse(date, formatter);
-        doctor = new Doctor(id, name, surname, dob, email);
-
+        doctor = new Doctor(email, fullName);
         return doctor;
     }
 
     /*
     Hay que añadir un recieveReport
      */
+
+    public Report recieveReport() throws IOException{
+        Report report = null;
+        String data = dataInputStream.readUTF();
+        report = new Report();
+        return report;
+    }
 
     /*
     El primer paso es recibir los reports/el doctor/el paciente por separado para
