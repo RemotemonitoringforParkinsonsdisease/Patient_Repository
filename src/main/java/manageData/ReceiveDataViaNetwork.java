@@ -43,17 +43,25 @@ public class ReceiveDataViaNetwork {
         return doctor;
     }
 
+    /*
+    Hay que añadir un recieveReport
+     */
+
+    /*
+    El primer paso es recibir los reports/el doctor/el paciente por separado para
+    mas tarde unirlo en un mismo paciente
+     */
     public Patient recievePatient(){
         Patient patient = null;
         try {
             int id = dataInputStream.readInt();
-            String name = dataInputStream.readUTF();
-            String surname = dataInputStream.readUTF();
+            String fullName = dataInputStream.readUTF();
             String date = dataInputStream.readUTF();
             String email = dataInputStream.readUTF();
+            String password = dataInputStream.readUTF();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             LocalDate dob = LocalDate.parse(date, formatter);
-            patient = new Patient(id, name, surname, dob, email);
+            patient = new Patient(id, fullName, dob, email);
         } catch (EOFException ex) {
             System.out.println("Todos los datos fueron leídos correctamente.");
         } catch (IOException ex) {
@@ -63,32 +71,6 @@ public class ReceiveDataViaNetwork {
         return patient;
     }
 
-    public Interpretation recieveInterpretation() throws IOException{
-        Interpretation interpretation = null;
-        try {
-            String stringDate = dataInputStream.readUTF();
-            int doctorId = dataInputStream.readInt();
-            String stringEMG = dataInputStream.readUTF();
-            int patientId = dataInputStream.readInt();
-            String stringEDA = dataInputStream.readUTF();
-            String observation = dataInputStream.readUTF();
-            String interpretationText = dataInputStream.readUTF();
-
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate date = LocalDate.parse(stringDate, formatter);
-
-            Signal signalEMG = new Signal(Signal.SignalType.EMG);
-            signalEMG.setValuesEMG(stringEMG);
-
-            Signal signalEDA = new Signal(Signal.SignalType.EDA);
-            signalEDA.setValuesEDA(stringEDA);
-
-            interpretation = new Interpretation(date, interpretationText, signalEMG, signalEDA, patientId, doctorId, observation);
-        } catch (EOFException ex) {
-            System.out.println("Todos los datos fueron leídos correctamente.");
-        }
-        return interpretation;
-    }
 
     public int receiveInt() {
         int message = 0;
