@@ -54,14 +54,14 @@ public class ReceiveDataViaNetwork {
     public Patient recievePatient(){
         Patient patient = null;
         try {
-            int id = dataInputStream.readInt();
+            String id = dataInputStream.readUTF();
             String fullName = dataInputStream.readUTF();
             String date = dataInputStream.readUTF();
             String email = dataInputStream.readUTF();
             String password = dataInputStream.readUTF();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             LocalDate dob = LocalDate.parse(date, formatter);
-            patient = new Patient(id, fullName, dob, email);
+            patient = new Patient(id, email, fullName, password, dob);
         } catch (EOFException ex) {
             System.out.println("Todos los datos fueron leídos correctamente.");
         } catch (IOException ex) {

@@ -19,6 +19,14 @@ public class Patient extends User{
         this.reports = reports;
     }
 
+    //Controctor para RecieveDataViaNetwork
+
+    public Patient (String id, String email, String fullName, String password, LocalDate dob) {
+        super(id, email, fullName);
+        this.password = password;
+        this.dob = dob;
+    }
+
     //Constructor para REGISTRARSE (crea el paciente que se envia al servidor)
     public Patient(String email, String fullName, String password, LocalDate dob) {
         super(email, fullName);
