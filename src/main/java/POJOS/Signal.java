@@ -121,7 +121,7 @@ public class Signal {
         return message.toString();
     }
 
-    public List<Integer> stringToValues(String str) {
+    public List<Float> stringToValues(String str) {
         values.clear(); // Limpiamos la lista antes de agregar nuevos valores.
         String[] tokens = str.split(" "); // Dividimos el String por el espacio.
         int size = tokens.length;
@@ -141,7 +141,7 @@ public class Signal {
      * Adds a list of new signal values to the existing signal.
      * @param values a list of new signal values to add.
      */
-    public void addValues(LinkedList<Integer> values){
+    public void addValues(LinkedList<Float> values){
         this.values.addAll(values);
     }
 

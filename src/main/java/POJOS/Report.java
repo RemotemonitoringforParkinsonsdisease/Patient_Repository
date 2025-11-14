@@ -18,7 +18,6 @@ public class Report {
 
 
     public Report(Patient patient, LocalDate reportDate, String patientObservation, String doctorObservation, Set<Symptoms> symptoms, Set<Signal> signals) {
-        this.reportId = createReportId();
         this.patient = patient;
         this.reportDate = reportDate;
         this.patientObservation = patientObservation;
@@ -27,18 +26,30 @@ public class Report {
         this.signals = signals;
     }
 
-
-    public String createReportId() {
-        String identifier = "R";
-        final int idLength = 9;
-        for (int i = 0; i < idLength; i++) {
-            Random rand = new Random();
-            identifier += rand.nextInt(10);
-        }
-        if(idList.contains(identifier)){
-            return createReportId();
-        }
-        return identifier;
+    public Report(Patient patient, LocalDate reportDate, String patientObservation, Set<Symptoms> symptoms, Set<Signal> signals) {
+        this.patient = patient;
+        this.reportDate = reportDate;
+        this.patientObservation = patientObservation;
+        this.doctorObservation = doctorObservation;
+        this.symptoms = symptoms;
+        this.signals = signals;
     }
+    public Report(Patient patient, LocalDate reportDate, String patientObservation, String doctorObservation, Set<Symptoms> symptoms) {
+        this.patient = patient;
+        this.reportDate = reportDate;
+        this.patientObservation = patientObservation;
+        this.doctorObservation = doctorObservation;
+        this.symptoms = symptoms;
+        this.signals = signals;
+    }
+    public Report(Patient patient, LocalDate reportDate, String doctorObservation, Set<Symptoms> symptoms, Set<Signal> signals) {
+        this.patient = patient;
+        this.reportDate = reportDate;
+        this.patientObservation = patientObservation;
+        this.doctorObservation = doctorObservation;
+        this.symptoms = symptoms;
+        this.signals = signals;
+    }
+
 
 }
