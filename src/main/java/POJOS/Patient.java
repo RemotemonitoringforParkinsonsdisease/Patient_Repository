@@ -1,17 +1,19 @@
 package POJOS;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class Patient extends User{
     private String password;
     private Doctor doctor;
     private LocalDate dob;
-    private Set <Report> reports = new HashSet<>();
+    private List<Report> reports = new ArrayList<>();
 
     //Constructor parea crear paciente desde Servidor
-    public Patient(String id, String email, String fullName, String password,  LocalDate dob, Doctor doctor, Set<Report> reports) {
+    public Patient(String id, String email, String fullName, String password,  LocalDate dob, Doctor doctor, List<Report> reports) {
         super(id, email, fullName);
         this.password = password;
         this.doctor = doctor;
@@ -64,11 +66,11 @@ public class Patient extends User{
         this.dob = dob;
     }
 
-    public Set<Report> getReports() {
+    public List<Report> getReports() {
         return reports;
     }
 
-    public void setReports(Set<Report> reports) {
+    public void setReports(List<Report> reports) {
         this.reports = reports;
     }
 }

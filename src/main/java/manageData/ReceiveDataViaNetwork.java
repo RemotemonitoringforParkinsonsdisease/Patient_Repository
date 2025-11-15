@@ -44,12 +44,13 @@ public class ReceiveDataViaNetwork {
     Hay que añadir un recieveReport
      */
 
-    public Report recieveReport() throws IOException{
+    //TODO
+    /*public Report recieveReport() throws IOException{
         Report report = null;
         String data = dataInputStream.readUTF();
         report = new Report();
         return report;
-    }
+    }*/
 
     /*
     El primer paso es recibir los reports/el doctor/el paciente por separado para
