@@ -22,7 +22,7 @@ public class User {
         this.id = id;
     }
 
-    //Constructor para LOGIN (antes de enviar a servidor)
+    //Constructor para LOGIN (antes de enviar a servidor) p
     public User(String email){
         this.email = email;
     }
