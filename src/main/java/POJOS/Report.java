@@ -34,7 +34,7 @@ public class Report {
         this.doctorObservation = doctorObservation;
 
     }
-    public Report(Patient patient, LocalDate reportDate, Set<Symptoms> symptoms, Set<Signal> signals, String doctorObservation) {
+    public Report(Patient patient, LocalDate reportDate, List<Symptoms> symptoms, Set<Signal> signals, String doctorObservation) {
         this.patient = patient;
         this.reportDate = reportDate;
         this.symptoms = symptoms;
@@ -60,13 +60,13 @@ public class Report {
         this.signals = signals;
         this.doctorObservation = doctorObservation;
     }
-    public Report(Patient patient, LocalDate reportDate, Set<Symptoms> symptoms, String doctorObservation) {
+    public Report(Patient patient, LocalDate reportDate, List<Symptoms> symptoms, String doctorObservation) {
         this.patient = patient;
         this.reportDate = reportDate;
         this.symptoms = symptoms;
         this.doctorObservation = doctorObservation;
     }
-    public Report(Patient patient, LocalDate reportDate, String patientObservation, Set<Symptoms> symptoms, Set<Signal> signals) {
+    public Report(Patient patient, LocalDate reportDate, String patientObservation, List<Symptoms> symptoms, Set<Signal> signals) {
         this.patient = patient;
         this.reportDate = reportDate;
         this.patientObservation = patientObservation;
@@ -74,13 +74,13 @@ public class Report {
         this.signals = signals;
     }
 
-    public Report(Patient patient, LocalDate reportDate, String patientObservation, Set<Symptoms> symptoms) {
+    public Report(Patient patient, LocalDate reportDate, String patientObservation, List<Symptoms> symptoms) {
         this.patient = patient;
         this.reportDate = reportDate;
         this.patientObservation = patientObservation;
         this.symptoms = symptoms;
     }
-    public Report(Patient patient, LocalDate reportDate, Set<Symptoms> symptoms, Set<Signal> signals) {
+    public Report(Patient patient, LocalDate reportDate, List<Symptoms> symptoms, Set<Signal> signals) {
         this.patient = patient;
         this.reportDate = reportDate;
         this.symptoms = symptoms;
@@ -102,7 +102,7 @@ public class Report {
         this.reportDate = reportDate;
         this.signals = signals;
     }
-    public Report(Patient patient, LocalDate reportDate, Set<Symptoms> symptoms) {
+    public Report(Patient patient, LocalDate reportDate, List<Symptoms> symptoms) {
         this.patient = patient;
         this.reportDate = reportDate;
         this.symptoms = symptoms;
