@@ -1,8 +1,6 @@
 package manageData;
 
-import POJOS.Doctor;
-import POJOS.Patient;
-import POJOS.Report;
+import POJOS.*;
 
 import java.io.DataInputStream;
 import java.io.EOFException;
@@ -40,17 +38,28 @@ public class ReceiveDataViaNetwork {
         return doctor;
     }
 
-    /*
-    Hay que añadir un recieveReport
-     */
-
-    //TODO
-    /*public Report recieveReport() throws IOException{
+    public Report receiveReport() throws IOException{
         Report report = null;
-        String data = dataInputStream.readUTF();
-        report = new Report();
+        try {
+            String reportId = dataInputStream.readUTF();
+            Patient patient = recievePatient();
+
+
+            String date = dataInputStream.readUTF();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate dateReport = LocalDate.parse(date, formatter);
+            String patientObservation = dataInputStream.readUTF();
+            String doctorObservation = dataInputStream.readUTF();
+            //TODO averiguar como leer un set de Sintomas y Señales
+        /*private Set<Symptoms> symptoms; //Sintomas de una lista cerrada
+        private Set<Signal> signals; //La señal grabada por el bitalino del paciente, supongo que seran varios canales, puede ser un Set / List de String, hay que mirar tipo de datos del Bitalino
+         */
+            report = new Report(patient, dateReport, patientObservation, doctorObservation);
+        } catch (IOException e) {
+            System.err.println("Error al leer el flujo de entrada: " + e.getMessage());
+        }
         return report;
-    }*/
+    }
 
     /*
     El primer paso es recibir los reports/el doctor/el paciente por separado para
