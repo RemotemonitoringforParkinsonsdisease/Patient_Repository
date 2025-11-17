@@ -43,8 +43,6 @@ public class ReceiveDataViaNetwork {
         try {
             String reportId = dataInputStream.readUTF();
             Patient patient = recievePatient();
-
-
             String date = dataInputStream.readUTF();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             LocalDate dateReport = LocalDate.parse(date, formatter);
