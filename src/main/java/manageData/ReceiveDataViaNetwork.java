@@ -8,7 +8,9 @@ import java.io.IOException;
 import java.net.Socket;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class ReceiveDataViaNetwork {
@@ -48,25 +50,41 @@ public class ReceiveDataViaNetwork {
             LocalDate dateReport = LocalDate.parse(date, formatter);
             String patientObservation = dataInputStream.readUTF();
             String doctorObservation = dataInputStream.readUTF();
-            Set<Symptoms> symptoms = receiveSymptoms();
+            List<Symptoms> symptoms = receiveSymptoms();
             Set<Signal> signals = receiveSignals();
 
-            report = new Report(patient, dateReport, patientObservation, symptoms, doctorObservation);
+            report = new Report(reportId, patient, dateReport, patientObservation, symptoms, signals, doctorObservation);
         } catch (IOException e) {
             System.err.println("Error al leer el flujo de entrada: " + e.getMessage());
         }
         return report;
     }
 
-    //TODO
-
     public Set<Signal> receiveSignals() throws IOException{
         Set<Signal> signals = new HashSet<>();
+        try {
+            int numSignals = dataInputStream.readInt();
+
+            for (int i = 0; i < numSignals; i++) {
+                String typeSignal = dataInputStream.readUTF();
+                SignalType type = SignalType.valueOf(typeSignal);
+                String signalId = dataInputStream.readUTF();
+                String valuesString = dataInputStream.readUTF();
+                Signal signal = new Signal(type, signalId);
+                //Esto recibe la lista completa de valores de la señal
+                signal.stringToValues(valuesString);
+                signals.add(signal);
+            }
+            return signals;
+        } catch (IOException e) {
+            System.out.println("Error al leer el flujo de entrada " + e.getMessage());
+        }
+        return signals;
     }
 
 
-    public Set<Symptoms> receiveSymptoms() throws IOException{
-        Set<Symptoms> symptoms = new HashSet<>();
+    public List<Symptoms> receiveSymptoms() throws IOException{
+        List<Symptoms> symptoms = new ArrayList<>();
         try {
             String symptomsLine = dataInputStream.readUTF();
             for (String s : symptomsLine.split(",")) {
