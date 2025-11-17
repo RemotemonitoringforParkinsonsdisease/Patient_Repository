@@ -48,15 +48,35 @@ public class ReceiveDataViaNetwork {
             LocalDate dateReport = LocalDate.parse(date, formatter);
             String patientObservation = dataInputStream.readUTF();
             String doctorObservation = dataInputStream.readUTF();
-            //TODO averiguar como leer un set de Sintomas y Señales
-        /*private Set<Symptoms> symptoms; //Sintomas de una lista cerrada
-        private Set<Signal> signals; //La señal grabada por el bitalino del paciente, supongo que seran varios canales, puede ser un Set / List de String, hay que mirar tipo de datos del Bitalino
-         */
-            report = new Report(patient, dateReport, patientObservation, doctorObservation);
+            Set<Symptoms> symptoms = receiveSymptoms();
+            Set<Signal> signals = receiveSignals();
+
+            report = new Report(patient, dateReport, patientObservation, symptoms, doctorObservation);
         } catch (IOException e) {
             System.err.println("Error al leer el flujo de entrada: " + e.getMessage());
         }
         return report;
+    }
+
+    //TODO
+
+    public Set<Signal> receiveSignals() throws IOException{
+        Set<Signal> signals = new HashSet<>();
+    }
+
+
+    public Set<Symptoms> receiveSymptoms() throws IOException{
+        Set<Symptoms> symptoms = new HashSet<>();
+        try {
+            String symptomsLine = dataInputStream.readUTF();
+            for (String s : symptomsLine.split(",")) {
+                symptoms.add(Symptoms.valueOf(s.trim()));
+            }
+            return symptoms;
+        } catch (IOException e) {
+            System.err.println("Error al leer el flujo de entrada: " + e.getMessage());
+        }
+        return symptoms;
     }
 
     /*
