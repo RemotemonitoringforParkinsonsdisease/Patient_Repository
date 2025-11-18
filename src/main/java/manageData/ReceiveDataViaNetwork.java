@@ -72,7 +72,7 @@ public class ReceiveDataViaNetwork {
                 String valuesString = dataInputStream.readUTF();
                 Signal signal = new Signal(type, signalId);
                 //Esto recibe la lista completa de valores de la señal
-                signal.stringToValues(valuesString);
+                signal.stringToFloatValues(valuesString);
                 signals.add(signal);
             }
             return signals;

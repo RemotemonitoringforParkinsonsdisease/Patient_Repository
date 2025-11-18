@@ -72,7 +72,7 @@ public class SendDataViaNetwork {
         for (Signal signal : signals) {
             dataOutputStream.writeUTF(signal.getSignalType().name());  // enum
             dataOutputStream.writeUTF(signal.getSignalId());           // id
-            dataOutputStream.writeUTF(signal.valuesToString());        // lista de floats → string
+            dataOutputStream.writeUTF(signal.floatValuesToString());        // lista de floats → string
         }
     }
 
