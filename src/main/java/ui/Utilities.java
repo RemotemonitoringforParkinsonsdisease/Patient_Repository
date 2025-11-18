@@ -69,13 +69,8 @@ public class Utilities {
 
     public static boolean checkEmail(String email) {
         Pattern pattern = Pattern.compile("([a-z0-9]+(\\.?[a-z0-9])*)+@(([a-z]+)\\.([a-z]+))+");
-        Matcher mather = pattern.matcher(email);
-        if (mather.find()) {
-            return true;
-        } else {
-            System.out.println("Please follow the email format: example@example.com");
-            return false;
-        }
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
     }
 
     public static String formatMacAdress(String input) {
