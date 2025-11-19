@@ -1,9 +1,11 @@
 package ui;
 
 import POJOS.Patient;
+import POJOS.Report;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.List;
 
 public class UI {
     private Connection connection;
@@ -23,7 +25,7 @@ public class UI {
     }
 
     private void preLoggedMenu() throws IOException {
-        System.out.println("\n\nWELCOME TO THE PATIENT APPLICATION\n\n");
+        System.out.println("\n\n-----WELCOME TO THE PATIENT APPLICATION-----\n\n");
         int option = 0;
         do {
             System.out.println("\n1) Login"
@@ -32,11 +34,14 @@ public class UI {
             );
             option = Utilities.readInteger("\n\nSelect an option: ");
             switch (option){
-                case 1: this.loginMenu();
+                case 1:
+                    this.loginMenu();
                     break;
-                case 2: this.registerMenu();
+                case 2:
+                    this.registerMenu();
                     break;
-                case 3: this.exitMenu();
+                case 3:
+                    this.exitMenu();
                     break;
                 default:
                     System.out.println("\nPlease select a valid option.\n");
@@ -46,7 +51,7 @@ public class UI {
     }
 
     private void registerMenu(){
-        System.out.println("\nREGISTER MENU");
+        System.out.println("\n-----REGISTER MENU-----\n");
         String fullName = Utilities.readString("Enter your full name: ");
         LocalDate dob = Utilities.readDate("Enter your DOB: ");
         String email = Utilities.readString("Enter your email: ");
@@ -54,11 +59,11 @@ public class UI {
         //Enviar al servidor los datos para registrar
         //Se carga el propio doctor y sus pacientes
         //Una vez este confirmado
-        this.loggedMenu();
+        //this.loggedMenu();
     }
 
     private void loginMenu() throws IOException {
-        System.out.println("\nLOGIN MENU");
+        System.out.println("\n-----LOGIN MENU-----\n");
 
         String email;
         boolean valid;
@@ -87,29 +92,28 @@ public class UI {
             System.out.println("Login successful!\n");
             Patient loggedPatient = connection.getReceiveViaNetwork().recievePatient();
             System.out.println("Welcome " + loggedPatient.getFullName() + "!\n");
-            this.loggedMenu();
+            this.loggedMenu(loggedPatient);
         } else {
             System.out.println("Login failed. Incorrect email or password.\n");
             loginMenu();
         }
-        this.loggedMenu();
     }
 
-    private void loggedMenu(){
+    private void loggedMenu(Patient patient){
         System.out.println("\nMAIN MENU");
         int option = 0;
         do{
             System.out.println("\n1) View my information" +
-                    "\n2)See my reports" +
-                    "\n3)Create a new report " +
-                    "\n4)Exit"
+                    "\n2) See my reports" +
+                    "\n3) Create a new report " +
+                    "\n4) Exit"
             );
             switch (option = Utilities.readInteger("Select an option: ")){
                 case 1:
-                    this.patientSeeInfo();
+                    this.patientSeeInfo(patient);
                     break;
                 case 2:
-                    this.patientSeeReports();
+                    this.patientSeeReports(patient);
                     break;
                 case 3:
                     this.createReport();
@@ -123,14 +127,51 @@ public class UI {
             }
         } while(true);
     }
-    private void patientSeeInfo(){
-        System.out.println("\nPATIENT LIST MENU");
 
+    private void patientSeeInfo(Patient patient){
+        System.out.println("\n-----YOUR INFORMATION-----\n");
+        System.out.println("Full Name: " + patient.getFullName());
+        System.out.println("Email: " + patient.getEmail());
+        System.out.println("Date of birth: " + patient.getDob());
 
+        if (patient.getDoctor() != null) {
+            System.out.println("Your assigned doctor: " + patient.getDoctor().getFullName());
+        }
+        System.out.println("\nPress ENTER to go back to the main menu...");
+        Utilities.readString("");
+        this.loggedMenu(patient);
     }
-    private void patientSeeReports(){
 
+    private void patientSeeReports(Patient patient){
+        System.out.println("\n-----YOUR REPORTS-----\n");
+        List<Report> reports = patient.getReports();
+
+        if (reports == null || reports.isEmpty()) {
+            System.out.println("You don't have any reports yet!\n");
+            System.out.println("\nPress ENTER to go back to the main menu...");
+            Utilities.readString("");
+            this.loggedMenu(patient);
+        }
+
+        //ordenamos por fechas
+        reports.sort((r1, r2) -> r2.getReportDate().compareTo(r1.getReportDate()));
+
+        for (int i = 0; i < reports.size(); i++) {
+            Report report = reports.get(i);
+            System.out.println("\n-----REPORT nº: " + (i+1) + " with date: " + report.getReportDate() + "-----\n");
+            System.out.println("Patient Observation: " + report.getPatientObservation());
+            System.out.println("Doctor Observation: " + report.getDoctorObservation());
+            System.out.println("Symptoms:");
+
+            for (int j = 0; j < report.getSymptoms().size(); j++) {
+                System.out.println(" - " + report.getSymptoms().get(i));
+            }
+        }
+        System.out.println("\nPress ENTER to go back...");
+        Utilities.readString("");
+        this.loggedMenu(patient);
     }
+
     private void createReport(){
 
     }
