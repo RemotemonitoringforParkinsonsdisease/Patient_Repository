@@ -1,11 +1,14 @@
 package ui;
 
-import POJOS.Patient;
-import POJOS.Report;
+import BITalino.*;
+import POJOS.*;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class UI {
     private Connection connection;
@@ -50,16 +53,52 @@ public class UI {
         } while(true);
     }
 
-    private void registerMenu(){
+    //TODO
+    private void registerMenu() throws IOException {
         System.out.println("\n-----REGISTER MENU-----\n");
-        String fullName = Utilities.readString("Enter your full name: ");
+
+        String fullName;
+        do {
+            fullName = Utilities.readString("Enter your full name: ");
+            if (fullName == null || fullName.trim().isEmpty()) {
+                System.out.println("Name cannot be empty.\n");
+            }
+        } while (fullName == null || fullName.trim().isEmpty());
+
         LocalDate dob = Utilities.readDate("Enter your DOB: ");
-        String email = Utilities.readString("Enter your email: ");
-        String password = Utilities.readString("Enter your password: ");
-        //Enviar al servidor los datos para registrar
-        //Se carga el propio doctor y sus pacientes
-        //Una vez este confirmado
-        //this.loggedMenu();
+
+        String email;
+        boolean valid;
+        do {
+            email = Utilities.readString("Enter your email: ");
+            valid = Utilities.checkEmail(email);
+
+            if (!valid) {
+                System.out.println("Please follow the email format: example@example.com\n");
+            }
+        } while (!valid);
+        connection.getSendViaNetwork().sendStrings(email);
+
+        String password;
+        do {
+            password = Utilities.readString("Enter your password: ");
+            if (password == null || password.isEmpty()) {
+                System.out.println("Password cannot be empty.\n");
+            }
+        } while (password == null || password.isEmpty());
+
+        String serverResponse = connection.getReceiveViaNetwork().receiveString();
+        if (serverResponse.equals("REGISTER OK")) {
+            System.out.println("Register successful!\n");
+            Patient registeredPatient = new Patient(fullName,email,password,dob);
+            connection.getSendViaNetwork().sendPatient(registeredPatient);
+            System.out.println("Welcome " + registeredPatient.getFullName() + "!\n");
+            this.loggedMenu(registeredPatient);
+
+        } else {
+            System.out.println("Register failed. Wrong email or password.\n");
+            registerMenu();
+        }
     }
 
     private void loginMenu() throws IOException {
@@ -87,7 +126,6 @@ public class UI {
         connection.getSendViaNetwork().sendStrings(password);
 
         String serverResponse = connection.getReceiveViaNetwork().receiveString();
-
         if (serverResponse.equals("OK")) {
             System.out.println("Login successful!\n");
             Patient loggedPatient = connection.getReceiveViaNetwork().recievePatient();
@@ -99,7 +137,7 @@ public class UI {
         }
     }
 
-    private void loggedMenu(Patient patient){
+    private void loggedMenu(Patient patient) throws IOException {
         System.out.println("\nMAIN MENU");
         int option = 0;
         do{
@@ -116,9 +154,10 @@ public class UI {
                     this.patientSeeReports(patient);
                     break;
                 case 3:
-                    this.createReport();
+                    this.createReport(patient);
                     break;
                 case 4:
+                    //TODO
                     this.exitMenu();
                     break;
                 default:
@@ -128,7 +167,7 @@ public class UI {
         } while(true);
     }
 
-    private void patientSeeInfo(Patient patient){
+    private void patientSeeInfo(Patient patient) throws IOException {
         System.out.println("\n-----YOUR INFORMATION-----\n");
         System.out.println("Full Name: " + patient.getFullName());
         System.out.println("Email: " + patient.getEmail());
@@ -142,7 +181,7 @@ public class UI {
         this.loggedMenu(patient);
     }
 
-    private void patientSeeReports(Patient patient){
+    private void patientSeeReports(Patient patient) throws IOException {
         System.out.println("\n-----YOUR REPORTS-----\n");
         List<Report> reports = patient.getReports();
 
@@ -172,12 +211,134 @@ public class UI {
         this.loggedMenu(patient);
     }
 
-    private void createReport(){
+    private void createReport(Patient patient) throws IOException {
+        System.out.println("\n-----CREATE NEW REPORT-----\n");
+        LocalDate reportDate = LocalDate.now();
+        String patientObservations = Utilities.readString("Introduce your observations: ");
+        System.out.println("Select your symptoms (type 0 to finish):");
+        System.out.println("Avaliable symptoms:");
 
+        int index = 1;
+        for (Symptoms symptom : Symptoms.values()) {
+            System.out.println(index + ") " + symptom);
+            index++;
+        }
+
+        List<Symptoms> selectedSymptoms = new ArrayList<>();
+        while (true) {
+            int choice = Utilities.readInteger("Please enter a symptom (0 to finish): ");
+
+            if (choice == 0) {
+                break;
+            }
+
+            if (choice < 0 || choice >= Symptoms.values().length) {
+                System.out.println("Please enter a valid symptom (0 to finish): ");
+                continue;
+            }
+            //Accede a todos los valores del enum como un array (abajo)
+            //Resta 1 porque el menú empieza en 1 pero el array en 0
+            Symptoms chosenSymptom = Symptoms.values()[choice-1];
+            selectedSymptoms.add(chosenSymptom);
+
+            System.out.println(chosenSymptom + ", added.");
+        }
+
+        System.out.println("\n-----SIGNAL CAPTURE-----");
+        Set<Signal> signals = new HashSet<>();
+
+        int index2 = 1;
+        for (SignalType type : SignalType.values()) {
+            System.out.println(index2 + ") " + type);
+            index2++;
+        }
+
+        while (true) {
+            int choice = Utilities.readInteger("Please enter a signal (0 to finish): ");
+
+            if (choice == 0) {
+                break;
+            }
+
+            if (choice < 0 || choice >= SignalType.values().length) {
+                System.out.println("Please enter a valid signal (0 to finish): ");
+                continue;
+            }
+
+            SignalType signalType = SignalType.values()[choice-1];
+            Signal signal = captureBitalinoSignal(signalType);
+
+            if (signal != null) {
+                signals.add(signal);
+            }
+        }
+
+        Report report = new Report(patient, reportDate, patientObservations, null, selectedSymptoms, signals);
+        connection.getSendViaNetwork().sendReport(report);
     }
-    private void exitMenu(){
 
+    private Signal captureBitalinoSignal(SignalType type) {
+
+        System.out.println("\nConnecting to BITalino...");
+        String mac = "...";  //Cambiar por el nuestro
+
+        //Canal traducido del tipo de señal que le pasamos
+        int channel = mapSignalTypeToChannel(type);
+
+        //Crear ID único para la señal (NO ENTIENDO Q POLLAS HACE ESTO)
+        String signalId = type + "_" + System.currentTimeMillis();
+        Signal signal = new Signal(type, signalId);
+
+        try {
+
+            BITalino device = new BITalino();
+
+            //Abrir conexión
+            device.open(mac, 100);
+
+            //Iniciar adquisición SOLO del canal elegido
+            device.start(new int[]{channel});
+
+            System.out.println("Recording " + type + " signal...");
+
+            //Lee 100 muestras (nuestro samplingRate)
+            Frame[] frames = device.read(100);
+
+            //Guarda valores en la señal
+            for (Frame frame : frames) {
+                float value = frame.analog[channel];
+                signal.getValues().add(value);
+            }
+
+            device.stop();
+            device.close();
+
+            System.out.println("Signal captured successfully!\n");
+            return signal;
+
+        } catch (Exception e) {
+            System.out.println("Error capturing " + type + " signal: " + e.getMessage());
+            return null;
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    //Los tipos de señal están asignados a los canales de la placa de bitalino
+    private int mapSignalTypeToChannel(SignalType type) {
+        switch (type) {
+            case ECG: return 0;
+            case EMG: return 1;
+            case EDA: return 2;
+            case ACC: return 3; // eje X, por ejemplo
+            default: return 0;
+        }
+    }
+
+    private void exitMenu(){
+        System.out.println("\nClosing the application...");
+        System.out.println("Goodbye!");
+        connection.releaseResources();
+        System.exit(0);
     }
 }
-
-

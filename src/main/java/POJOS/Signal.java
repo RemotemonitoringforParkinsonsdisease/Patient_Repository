@@ -50,6 +50,7 @@ public class Signal {
     public int getSamplingRate() {
         return samplingRate;
     }
+
     public void storeSignalInFile() {
         FileWriter fw = null;
         BufferedWriter bw = null;
@@ -72,7 +73,7 @@ public class Signal {
 
                 }
             }
-            String contenido = getSignalValues(samplingRate).toString();
+            String contenido = getSignalValues().toString();
             File file = new File(ruta);
             if (!file.exists()) {
                 file.createNewFile();
@@ -93,11 +94,10 @@ public class Signal {
         }
     }
 
-
-    public LinkedList<Float> getSignalValues(int samplingRate) {
+    public LinkedList<Float> getSignalValues() {
         LinkedList<Float> result = new LinkedList<>();
-        for (int j = 0; j < samplingRate; j++) {
-            int blockSize = samplingRate;
+        for (int j = 0; j < this.samplingRate; j++) {
+            int blockSize = this.samplingRate;
             // Si necesitas esta información visual, puedes guardarla en otro lugar.
             for (int i = 0; i < blockSize; i++) {
                 int value = j * blockSize + i;
