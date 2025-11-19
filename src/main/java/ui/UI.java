@@ -153,7 +153,7 @@ public class UI {
             this.loggedMenu(patient);
         }
 
-        //ordenamos por fechas
+        //ordenamos por fechas, pero en verdad ya estarán ordenadas no??
         reports.sort((r1, r2) -> r2.getReportDate().compareTo(r1.getReportDate()));
 
         for (int i = 0; i < reports.size(); i++) {
