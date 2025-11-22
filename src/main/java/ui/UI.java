@@ -281,7 +281,7 @@ public class UI {
         }
 
         Report report = new Report(patient, reportDate, patientObservations, null, selectedSymptoms, signals);
-        connection.getSendViaNetwork().sendReport(report);
+        connection.getSendViaNetwork().sendReports(report);
     }
 
     private Signal captureBitalinoSignal(SignalType type) {

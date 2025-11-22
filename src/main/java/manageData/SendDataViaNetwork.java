@@ -65,6 +65,19 @@ public class SendDataViaNetwork {
             dataOutputStream.flush();
         }
     }
+
+    public void sendReport(Report r) throws IOException{
+        dataOutputStream.writeInt(r.getReportId());
+        dataOutputStream.writeInt(r.getPatientId());
+        dataOutputStream.writeUTF(r.getReportDate().toString());
+        sendSymptoms(r.getSymptoms());
+        sendSignals(r.getSignals());
+        dataOutputStream.writeUTF(r.getPatientObservation());
+        dataOutputStream.writeUTF(r.getDoctorObservation());
+        dataOutputStream.flush();
+    }
+
+
     public void sendSymptoms(List<Symptoms> symptoms) throws IOException{
         StringBuilder sb = new StringBuilder();
 
