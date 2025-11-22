@@ -48,19 +48,19 @@ public class UI {
         System.out.println("\n\n-----WELCOME TO THE PATIENT APPLICATION-----\n\n");
         int option = 0;
         do {
-            System.out.println("\n1) Log-in"
-                    + "\n2) Register"
+            System.out.println("\n1) Register"
+                    + "\n2) Log-in"
                     + "\n3) Exit"
             );
             option = Utilities.readInteger("\n\nSelect an option: ");
             switch (option){
                 case 1:
                     connection.getSendViaNetwork().sendInt(1);
-                    this.loginMenu();
+                    this.registerMenu();
                     break;
                 case 2:
                     connection.getSendViaNetwork().sendInt(2);
-                    this.registerMenu();
+                    this.loginMenu();
                     break;
                 case 3:
                     connection.getSendViaNetwork().sendInt(3);
@@ -112,8 +112,7 @@ public class UI {
 
             Patient registeredPatient = new Patient(password, fullName, dob);
             connection.getSendViaNetwork().sendRegisteredPatient(registeredPatient);
-            connection.getSendViaNetwork().sendStrings("PATIENT REGISTERED");
-            loggedMenu();
+            loggedInMenu();
 
         } else {
             System.out.println("Register failed. Email already exists!\n");
@@ -150,7 +149,7 @@ public class UI {
 
                 if (passwordVerification.equals("PASSWORD OK")) {
                     System.out.println("Login successful!\n");
-                    this.loggedMenu();
+                    this.loggedInMenu();
                 } else {
                     System.out.println("Login failed. Incorrect email or password.\n");
                     loginMenu();
@@ -162,48 +161,42 @@ public class UI {
         } while (true);
     }
 
-    private void loggedMenu() throws IOException {
-        String check = connection.getReceiveViaNetwork().receiveString();
-        if (check.equals("PATIENT LOGGED")) {
-            Patient patient = connection.getReceiveViaNetwork().recievePatient();
-            System.out.println("Welcome " + patient.getFullName() + "!\n");
+    private void loggedInMenu() throws IOException {
+        Patient patient = connection.getReceiveViaNetwork().recievePatient();
+        System.out.println("Welcome " + patient.getFullName() + "!\n");
 
-            System.out.println("\n-----PATIENT MAIN MENU-----");
-            int option = 0;
-            do{
-                System.out.println("\n1) View my information" +
-                        "\n2) See my reports" +
-                        "\n3) Create a new report " +
-                        "\n4) Exit"
-                );
-                switch (option = Utilities.readInteger("Select an option: ")){
-                    case 1:
-                        connection.getSendViaNetwork().sendInt(1);
-                        this.patientSeeInfo(patient);
-                        break;
-                    case 2:
-                        this.patientSeeReports(patient);
-                        break;
-                    case 3:
-                        connection.getSendViaNetwork().sendInt(2);
-                        this.createReport(patient);
-                        break;
-                    case 4:
-                        this.exitMenu();
-                        break;
-                    default:
-                        System.out.println("Please select a valid option.\n");
-                        break;
-                }
-            } while(true);
-        } else {
-            System.out.println("Login failed");
-            loginMenu();
-        }
+        System.out.println("\n-----PATIENT MAIN MENU-----");
+        int option = 0;
+        do{
+            System.out.println("\n1) View my information" +
+                    "\n2) See my reports" +
+                    "\n3) Create a new report " +
+                    "\n4) Exit"
+            );
+            switch (option = Utilities.readInteger("Select an option: ")){
+                case 1:
+                    connection.getSendViaNetwork().sendInt(1);
+                    this.seePatientInfo(patient);
+                    break;
+                case 2:
+                    this.patientSeeReports(patient);
+                    break;
+                case 3:
+                    connection.getSendViaNetwork().sendInt(2);
+                    this.createReport(patient);
+                    break;
+                case 4:
+                    connection.getSendViaNetwork().sendInt(3);
+                    this.exitMenu();
+                    break;
+                default:
+                    System.out.println("Please select a valid option.\n");
+                    break;
+            }
+        } while(true);
     }
 
-    //TODO
-    private void patientSeeInfo(Patient patient) throws IOException {
+    private void seePatientInfo(Patient patient) throws IOException {
         User patientUser = connection.getReceiveViaNetwork().recieveUser();
         System.out.println("\n-----YOUR INFORMATION-----\n");
         System.out.println("Full Name: " + patient.getFullName());
@@ -211,17 +204,19 @@ public class UI {
         System.out.println("Date of birth: " + patient.getDob());
 
         if (patient.getDoctorId() != null) {
-            connection.getSendViaNetwork().sendInt(patient.getDoctorId());
-            Doctor doctor = connection.getReceiveViaNetwork().receiveDoctor();
-            System.out.println("Your assigned doctor is: " + doctor.getFullName());
+            //connection.getSendViaNetwork().sendInt(patient.getDoctorId());
+            String doctorName = connection.getReceiveViaNetwork().receiveString();
+            System.out.println("Your assigned doctor is: " + doctorName);
+        } else {
+            String verificationDoctor = connection.getReceiveViaNetwork().receiveString();
+            System.out.println(verificationDoctor);
         }
         System.out.println("\nPress ENTER to go back to the main menu...");
         Utilities.readString("");
         //loggedMenu(patient);
-        loggedMenu();
+        loggedInMenu();
     }
 
-    //TODO
     private void patientSeeReports(Patient patient) throws IOException {
         System.out.println("\n-----YOUR REPORTS-----\n");
         List<Report> reports = patient.getReports();
@@ -231,7 +226,7 @@ public class UI {
             System.out.println("\nPress ENTER to go back to the main menu...");
             Utilities.readString("");
             //this.loggedMenu(patient);
-            this.loggedMenu();
+            this.loggedInMenu();
         }
 
         //ordenamos por fechas, pero en verdad ya estarán ordenadas no??
@@ -251,14 +246,13 @@ public class UI {
         System.out.println("\nPress ENTER to go back...");
         Utilities.readString("");
         //this.loggedMenu(patient);
-        this.loggedMenu();
+        this.loggedInMenu();
     }
 
     private void createReport(Patient patient) throws IOException {
         System.out.println("\n-----CREATE NEW REPORT-----\n");
         LocalDate reportDate = LocalDate.now();
         String patientObservations = Utilities.readString("Introduce your observations: ");
-        System.out.println("Select your symptoms (type 0 to finish):");
         System.out.println("Available symptoms:");
 
         int index = 1;
@@ -318,10 +312,12 @@ public class UI {
 
         Report report = new Report(patient.getPatientId(), reportDate, patientObservations, null, selectedSymptoms, signals);
         connection.getSendViaNetwork().sendReport(report);
+        String verificationReport = connection.getReceiveViaNetwork().receiveString();
+        System.out.println(verificationReport);
     }
 
     private Signal captureBitalinoSignal(SignalType type) {
-
+        //TODO mirar excepciones posibles
         System.out.println("\nConnecting to BITalino...");
         String mac = "...";  //Cambiar por el nuestro
 
@@ -346,6 +342,7 @@ public class UI {
             Frame[] frames = device.read(100);
 
             //Guarda valores en la señal
+            //TODO revisar como pasar datos a enteros desde BITalino
             for (Frame frame : frames) {
                 int value = frame.analog[channel];
                 signal.getValues().add(value);
