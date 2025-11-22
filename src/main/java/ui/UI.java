@@ -204,7 +204,6 @@ public class UI {
         System.out.println("Date of birth: " + patient.getDob());
 
         if (patient.getDoctorId() != null) {
-            //connection.getSendViaNetwork().sendInt(patient.getDoctorId());
             String doctorName = connection.getReceiveViaNetwork().receiveString();
             System.out.println("Your assigned doctor is: " + doctorName);
         } else {
@@ -213,7 +212,6 @@ public class UI {
         }
         System.out.println("\nPress ENTER to go back to the main menu...");
         Utilities.readString("");
-        //loggedMenu(patient);
         loggedInMenu();
     }
 
@@ -225,7 +223,6 @@ public class UI {
             System.out.println("You don't have any reports yet!\n");
             System.out.println("\nPress ENTER to go back to the main menu...");
             Utilities.readString("");
-            //this.loggedMenu(patient);
             this.loggedInMenu();
         }
 
@@ -245,7 +242,6 @@ public class UI {
         }
         System.out.println("\nPress ENTER to go back...");
         Utilities.readString("");
-        //this.loggedMenu(patient);
         this.loggedInMenu();
     }
 
