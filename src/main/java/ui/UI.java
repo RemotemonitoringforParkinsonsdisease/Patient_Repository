@@ -6,9 +6,7 @@ import POJOS.*;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class UI {
     private Connection connection;
@@ -20,16 +18,29 @@ public class UI {
         ui.preLoggedMenu();
     }
 
-    private void startConnection() throws IOException { //TODO: Iterar hasta conexión correcta
-        System.out.println("Select IP Address and Port to connect to :");
-        String ipAddress = Utilities.readString("IP Address: ");
-        int port = Utilities.readInteger("Port: ");
-        this.connection = new Connection(ipAddress, port);
-        connection.getSendViaNetwork().sendInt(1);
-        String message = connection.getReceiveViaNetwork().receiveString();
-        System.out.println(message);
-        if(message.equals("PATIENT")){
-            this.preLoggedMenu();
+    private void startConnection() {
+        boolean connected = false;
+
+        while (!connected) {
+            System.out.println("Select IP Address and Port to connect to :");
+            String ipAddress = Utilities.readString("IP Address: ");
+            int port = Utilities.readInteger("Port: ");
+
+            this.connection = new Connection(ipAddress, port);
+            connected = true; // si no lanza excepción, se conectó correctamente
+        }
+
+        try {
+            connection.getSendViaNetwork().sendInt(1);
+            String message = connection.getReceiveViaNetwork().receiveString();
+            System.out.println(message);
+
+            if ("PATIENT".equals(message)) {
+                this.preLoggedMenu();
+            }
+
+        } catch (IOException e) {
+            System.out.println("Error in communication once it was connected.");
         }
     }
 
