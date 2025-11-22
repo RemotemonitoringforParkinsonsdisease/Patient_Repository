@@ -8,7 +8,6 @@ import POJOS.Symptoms;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,7 +45,7 @@ public class SendDataViaNetwork {
         dataOutputStream.flush();
     }
 
-    public void sendPatientRegister(Patient patient) throws IOException{
+    public void sendRegisteredPatient(Patient patient) throws IOException{
         dataOutputStream.writeUTF(patient.getPatientPassword());
         dataOutputStream.writeUTF(patient.getFullName());
         dataOutputStream.writeUTF(patient.getDob().toString());

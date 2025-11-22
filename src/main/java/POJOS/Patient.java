@@ -26,10 +26,21 @@ public class Patient {
         this.reports = reports;
     }
 
-    public Patient(String patientPassword, LocalDate dob, String fullName) {
+    //sin reports, se acaba de registrar
+    public Patient(Integer patientId, Integer userId, Integer doctorId, String patientPassword, String fullName, LocalDate dob) {
+        this.patientId = patientId;
+        this.userId = userId;
+        this.doctorId = doctorId;
         this.patientPassword = patientPassword;
-        this.dob = dob;
         this.fullName = fullName;
+        this.dob = dob;
+        this.reports = new ArrayList<>();
+    }
+
+    public Patient(String patientPassword, String fullName, LocalDate dob) {
+        this.patientPassword = patientPassword;
+        this.fullName = fullName;
+        this.dob = dob;
     }
 
     public Integer getPatientId() {

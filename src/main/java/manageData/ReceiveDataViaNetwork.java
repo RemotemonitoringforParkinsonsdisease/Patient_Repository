@@ -136,6 +136,19 @@ public class ReceiveDataViaNetwork {
         return patient;
     }
 
+    public User recieveUser(){
+        User user = null;
+        try {
+            Integer userId = dataInputStream.readInt();
+            String email = dataInputStream.readUTF();
+
+            user = new User(userId,email);
+        } catch (IOException e) {
+            System.err.println("Error al leer el flujo de entrada: " + e.getMessage());
+        }
+        return user;
+    }
+
     public int receiveInt() {
         int message = 0;
         try {

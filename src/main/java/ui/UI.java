@@ -99,8 +99,10 @@ public class UI {
                 }
             } while (password == null || password.isEmpty());
 
-            Patient patient = new Patient(password, dob, fullName);
-            connection.getSendViaNetwork().sendPatient(patient);
+            Patient registeredPatient = new Patient(password, fullName, dob);
+            connection.getSendViaNetwork().sendRegisteredPatient(registeredPatient);
+            connection.getSendViaNetwork().sendStrings("PATIENT REGISTERED");
+            loggedMenu();
 
         } else {
             System.out.println("Register failed. Email already exists!\n");
@@ -109,7 +111,7 @@ public class UI {
     }
 
     private void loginMenu() throws IOException {
-        System.out.println("\n-----LOGIN MENU-----\n");
+        System.out.println("\n-----PATIENT LOGIN MENU-----\n");
 
         String email;
         boolean valid;
@@ -121,66 +123,82 @@ public class UI {
                 System.out.println("Please follow the email format: example@example.com\n");
             }
         } while (!valid);
+
         connection.getSendViaNetwork().sendStrings(email);
+        String emailVerification = connection.getReceiveViaNetwork().receiveString();
 
-        String password;
-        do {
-            password = Utilities.readString("Enter your password: ");
-            if (password == null || password.isEmpty()) {
-                System.out.println("Password cannot be empty.\n");
+        if (emailVerification.equals("EMAIL OK")) {
+            String password;
+            do {
+                password = Utilities.readString("Enter your password: ");
+                if (password == null || password.isEmpty()) {
+                    System.out.println("Password cannot be empty.\n");
+                }
+            } while (password == null || password.isEmpty());
+
+            connection.getSendViaNetwork().sendStrings(password);
+            String passwordVerification = connection.getReceiveViaNetwork().receiveString();
+
+            if (passwordVerification.equals("PASSWORD OK")) {
+                System.out.println("Login successful!\n");
+                loggedMenu();
+            } else {
+                System.out.println("Login failed. Incorrect email or password.\n");
+                loginMenu();
             }
-        } while (password == null || password.isEmpty());
-        connection.getSendViaNetwork().sendStrings(password);
+        }
+    }
 
-        String serverResponse = connection.getReceiveViaNetwork().receiveString();
-        if (serverResponse.equals("OK")) {
-            System.out.println("Login successful!\n");
-            Patient loggedPatient = connection.getReceiveViaNetwork().recievePatient();
-            System.out.println("Welcome " + loggedPatient.getFullName() + "!\n");
-            this.loggedMenu(loggedPatient);
+    private void loggedMenu() throws IOException {
+        String check = connection.getReceiveViaNetwork().receiveString();
+        if (check.equals("PATIENT LOGGED")) {
+            Patient patient = connection.getReceiveViaNetwork().recievePatient();
+            System.out.println("Welcome " + patient.getFullName() + "!\n");
+
+            System.out.println("\n-----PATIENT MAIN MENU-----");
+            int option = 0;
+            do{
+                System.out.println("\n1) View my information" +
+                        "\n2) See my reports" +
+                        "\n3) Create a new report " +
+                        "\n4) Exit"
+                );
+                switch (option = Utilities.readInteger("Select an option: ")){
+                    case 1:
+                        connection.getSendViaNetwork().sendInt(1);
+                        this.patientSeeInfo(patient);
+                        break;
+                    case 2:
+                        this.patientSeeReports(patient);
+                        break;
+                    case 3:
+                        connection.getSendViaNetwork().sendInt(2);
+                        this.createReport(patient);
+                        break;
+                    case 4:
+                        this.exitMenu();
+                        break;
+                    default:
+                        System.out.println("Please select a valid option.\n");
+                        break;
+                }
+            } while(true);
         } else {
-            System.out.println("Login failed. Incorrect email or password.\n");
+            System.out.println("Login failed");
             loginMenu();
         }
     }
 
-    private void loggedMenu(Patient patient) throws IOException {
-        System.out.println("\nMAIN MENU");
-        int option = 0;
-        do{
-            System.out.println("\n1) View my information" +
-                    "\n2) See my reports" +
-                    "\n3) Create a new report " +
-                    "\n4) Exit"
-            );
-            switch (option = Utilities.readInteger("Select an option: ")){
-                case 1:
-                    this.patientSeeInfo(patient);
-                    break;
-                case 2:
-                    this.patientSeeReports(patient);
-                    break;
-                case 3:
-                    this.createReport(patient);
-                    break;
-                case 4:
-                    //TODO
-                    this.exitMenu();
-                    break;
-                default:
-                    System.out.println("Please select a valid option.\n");
-                    break;
-            }
-        } while(true);
-    }
-
+    //TODO
     private void patientSeeInfo(Patient patient) throws IOException {
+        User patientUser = connection.getReceiveViaNetwork().recieveUser();
         System.out.println("\n-----YOUR INFORMATION-----\n");
         System.out.println("Full Name: " + patient.getFullName());
-        System.out.println("Email: " + patient.getEmail());
+        System.out.println("Email: " + patientUser.getEmail());
         System.out.println("Date of birth: " + patient.getDob());
 
-        if (patient.getDoctor() != null) {
+        if (patient.getDoctorId() != null) {
+            //Doctor
             System.out.println("Your assigned doctor: " + patient.getDoctor().getFullName());
         }
         System.out.println("\nPress ENTER to go back to the main menu...");
@@ -188,6 +206,7 @@ public class UI {
         this.loggedMenu(patient);
     }
 
+    //TODO
     private void patientSeeReports(Patient patient) throws IOException {
         System.out.println("\n-----YOUR REPORTS-----\n");
         List<Report> reports = patient.getReports();
@@ -223,7 +242,7 @@ public class UI {
         LocalDate reportDate = LocalDate.now();
         String patientObservations = Utilities.readString("Introduce your observations: ");
         System.out.println("Select your symptoms (type 0 to finish):");
-        System.out.println("Avaliable symptoms:");
+        System.out.println("Available symptoms:");
 
         int index = 1;
         for (Symptoms symptom : Symptoms.values()) {
