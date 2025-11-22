@@ -20,30 +20,39 @@ public class UI {
         ui.preLoggedMenu();
     }
 
-    private void startConnection() { //TODO: Iterar hasta conexión correcta
+    private void startConnection() throws IOException { //TODO: Iterar hasta conexión correcta
         System.out.println("Select IP Address and Port to connect to :");
         String ipAddress = Utilities.readString("IP Address: ");
         int port = Utilities.readInteger("Port: ");
         this.connection = new Connection(ipAddress, port);
+        connection.getSendViaNetwork().sendInt(1);
+        String message = connection.getReceiveViaNetwork().receiveString();
+        System.out.println(message);
+        if(message.equals("PATIENT")){
+            this.preLoggedMenu();
+        }
     }
 
     private void preLoggedMenu() throws IOException {
         System.out.println("\n\n-----WELCOME TO THE PATIENT APPLICATION-----\n\n");
         int option = 0;
         do {
-            System.out.println("\n1) Login"
+            System.out.println("\n1) Log-in"
                     + "\n2) Register"
                     + "\n3) Exit"
             );
             option = Utilities.readInteger("\n\nSelect an option: ");
             switch (option){
                 case 1:
+                    connection.getSendViaNetwork().sendInt(1);
                     this.loginMenu();
                     break;
                 case 2:
+                    connection.getSendViaNetwork().sendInt(2);
                     this.registerMenu();
                     break;
                 case 3:
+                    connection.getSendViaNetwork().sendInt(3);
                     this.exitMenu();
                     break;
                 default:
@@ -53,22 +62,12 @@ public class UI {
         } while(true);
     }
 
-    //TODO
     private void registerMenu() throws IOException {
         System.out.println("\n-----REGISTER MENU-----\n");
 
-        String fullName;
-        do {
-            fullName = Utilities.readString("Enter your full name: ");
-            if (fullName == null || fullName.trim().isEmpty()) {
-                System.out.println("Name cannot be empty.\n");
-            }
-        } while (fullName == null || fullName.trim().isEmpty());
-
-        LocalDate dob = Utilities.readDate("Enter your DOB: ");
-
         String email;
         boolean valid;
+
         do {
             email = Utilities.readString("Enter your email: ");
             valid = Utilities.checkEmail(email);
@@ -77,26 +76,34 @@ public class UI {
                 System.out.println("Please follow the email format: example@example.com\n");
             }
         } while (!valid);
+
         connection.getSendViaNetwork().sendStrings(email);
-
-        String password;
-        do {
-            password = Utilities.readString("Enter your password: ");
-            if (password == null || password.isEmpty()) {
-                System.out.println("Password cannot be empty.\n");
-            }
-        } while (password == null || password.isEmpty());
-
         String serverResponse = connection.getReceiveViaNetwork().receiveString();
-        if (serverResponse.equals("REGISTER OK")) {
-            System.out.println("Register successful!\n");
-            Patient registeredPatient = new Patient(fullName,email,password,dob);
-            connection.getSendViaNetwork().sendPatient(registeredPatient);
-            System.out.println("Welcome " + registeredPatient.getFullName() + "!\n");
-            this.loggedMenu(registeredPatient);
+
+        if (serverResponse.equals("EMAIL OK")) {
+            String fullName;
+            do {
+                fullName = Utilities.readString("Enter your full name: ");
+                if (fullName == null || fullName.trim().isEmpty()) {
+                    System.out.println("Name cannot be empty.\n");
+                }
+            } while (fullName == null || fullName.trim().isEmpty());
+
+            LocalDate dob = Utilities.readDate("Enter your DOB: ");
+
+            String password;
+            do {
+                password = Utilities.readString("Enter your password: ");
+                if (password == null || password.isEmpty()) {
+                    System.out.println("Password cannot be empty.\n");
+                }
+            } while (password == null || password.isEmpty());
+
+            Patient patient = new Patient(password, dob, fullName);
+            connection.getSendViaNetwork().sendPatient(patient);
 
         } else {
-            System.out.println("Register failed. Wrong email or password.\n");
+            System.out.println("Register failed. Email already exists!\n");
             registerMenu();
         }
     }

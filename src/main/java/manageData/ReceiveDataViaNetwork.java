@@ -9,9 +9,7 @@ import java.net.Socket;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class ReceiveDataViaNetwork {
 
@@ -31,48 +29,62 @@ public class ReceiveDataViaNetwork {
         return dataInputStream.readUTF();
     }
 
-
     public Doctor receiveDoctor() throws IOException{
         Doctor doctor = null;
+        Integer doctorId = Integer.parseInt(receiveString());
+        Integer userId = Integer.parseInt(receiveString());
         String fullName = dataInputStream.readUTF();
-        String email = dataInputStream.readUTF();
-        doctor = new Doctor(email, fullName);
+        doctor = new Doctor(doctorId, userId, fullName);
         return doctor;
     }
 
+    public List<Report> receiveReports() throws IOException{
+        List<Report> reports = new ArrayList<>();
+        try {
+            int numberOfReports = dataInputStream.readInt();
+            for (int i = 0; i < numberOfReports; i++) {
+                reports.add(receiveReport());
+            }
+            return reports;
+        } catch (IOException e){
+            System.err.println("Error al leer el flujo de entrada: " + e.getMessage());
+        }
+        return reports;
+    }
     public Report receiveReport() throws IOException{
         Report report = null;
+
         try {
-            String reportId = dataInputStream.readUTF();
-            Patient patient = recievePatient();
+            Integer reportId = dataInputStream.readInt();
+            Integer patientId = dataInputStream.readInt();
             String date = dataInputStream.readUTF();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate dateReport = LocalDate.parse(date, formatter);
+            LocalDate reportDate = LocalDate.parse(date, formatter);
+            List<Signal> signals = receiveSignals();
+            List<Symptoms> symptoms = receiveSymptoms();
             String patientObservation = dataInputStream.readUTF();
             String doctorObservation = dataInputStream.readUTF();
-            List<Symptoms> symptoms = receiveSymptoms();
-            Set<Signal> signals = receiveSignals();
 
-            report = new Report(reportId, patient, dateReport, patientObservation, symptoms, signals, doctorObservation);
+            report = new Report(reportId, patientId, reportDate, signals, symptoms, patientObservation, doctorObservation);
         } catch (IOException e) {
             System.err.println("Error al leer el flujo de entrada: " + e.getMessage());
         }
         return report;
     }
 
-    public Set<Signal> receiveSignals() throws IOException{
-        Set<Signal> signals = new HashSet<>();
+    public List<Signal> receiveSignals() throws IOException{
+        List<Signal> signals = new ArrayList<>();
         try {
             int numSignals = dataInputStream.readInt();
 
             for (int i = 0; i < numSignals; i++) {
+                Integer signalId = dataInputStream.readInt();
                 String typeSignal = dataInputStream.readUTF();
-                SignalType type = SignalType.valueOf(typeSignal);
-                String signalId = dataInputStream.readUTF();
+                SignalType signalType = SignalType.valueOf(typeSignal);
                 String valuesString = dataInputStream.readUTF();
-                Signal signal = new Signal(type, signalId);
+                Signal signal = new Signal(signalId, signalType);
                 //Esto recibe la lista completa de valores de la señal
-                signal.stringToFloatValues(valuesString);
+                signal.stringToIntValues(valuesString);
                 signals.add(signal);
             }
             return signals;
@@ -104,14 +116,17 @@ public class ReceiveDataViaNetwork {
     public Patient recievePatient(){
         Patient patient = null;
         try {
-            String id = dataInputStream.readUTF();
+            Integer patientId = dataInputStream.readInt();
+            Integer userId = dataInputStream.readInt();
+            Integer doctorId = dataInputStream.readInt();
+            String patientPassword = dataInputStream.readUTF();
             String fullName = dataInputStream.readUTF();
             String date = dataInputStream.readUTF();
-            String email = dataInputStream.readUTF();
-            String password = dataInputStream.readUTF();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             LocalDate dob = LocalDate.parse(date, formatter);
-            patient = new Patient(id, email, fullName, password, dob);
+            List<Report> reports = receiveReports();
+
+            patient = new Patient(patientId, userId, doctorId, patientPassword, fullName, dob, reports);
         } catch (EOFException ex) {
             System.out.println("Todos los datos fueron leídos correctamente.");
         } catch (IOException ex) {
@@ -120,7 +135,6 @@ public class ReceiveDataViaNetwork {
         }
         return patient;
     }
-
 
     public int receiveInt() {
         int message = 0;
@@ -132,6 +146,7 @@ public class ReceiveDataViaNetwork {
         }
         return message;
     }
+
     /**
      * Releases the resources used by the `DataInputStream`.
      */

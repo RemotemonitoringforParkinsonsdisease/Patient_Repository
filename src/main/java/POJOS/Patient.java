@@ -6,56 +6,70 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class Patient extends User{
-    private String password;
-    private Doctor doctor;
+public class Patient {
+    private Integer patientId;
+    private Integer userId;
+    private Integer doctorId;
+    private String patientPassword; //TODO encriptar
     private LocalDate dob;
     private List<Report> reports = new ArrayList<>();
+    private String fullName;
 
-    //Constructor parea crear paciente desde Servidor
-    public Patient(String id, String email, String fullName, String password,  LocalDate dob, Doctor doctor, List<Report> reports) {
-        super(id, email, fullName);
-        this.password = password;
-        this.doctor = doctor;
+    //Constructor entero de PATIENT
+    public Patient(Integer patientId, Integer userId, Integer doctorId, String patientPassword, String fullName, LocalDate dob, List<Report> reports) {
+        this.patientId = patientId;
+        this.userId = userId;
+        this.doctorId = doctorId;
+        this.patientPassword = patientPassword;
+        this.fullName = fullName;
         this.dob = dob;
         this.reports = reports;
     }
 
-    //Controctor para RecieveDataViaNetwork
-
-    public Patient (String id, String email, String fullName, String password, LocalDate dob) {
-        super(id, email, fullName);
-        this.password = password;
+    public Patient(String patientPassword, LocalDate dob, String fullName) {
+        this.patientPassword = patientPassword;
         this.dob = dob;
+        this.fullName = fullName;
     }
 
-    //Constructor para REGISTRARSE (crea el paciente que se envia al servidor)
-    public Patient(String email, String fullName, String password, LocalDate dob) {
-        super(email, fullName);
-        this.dob = dob;
-        this.password = password;
+    public Integer getPatientId() {
+        return patientId;
     }
 
-    //Constructor para LOGIN antes de envíar a servidor
-    public Patient(String email, String password) {
-        super(email);
-        this.password = password;
+    public void setPatientId(Integer patientId) {
+        this.patientId = patientId;
     }
 
-    public String getPassword() {
-        return password;
+    public Integer getUserId() {
+        return userId;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
-    public Doctor getDoctor() {
-        return doctor;
+    public Integer getDoctorId() {
+        return doctorId;
     }
 
-    public void setDoctor(Doctor doctor) {
-        this.doctor = doctor;
+    public void setDoctorId(Integer doctorId) {
+        this.doctorId = doctorId;
+    }
+
+    public String getPatientPassword() {
+        return patientPassword;
+    }
+
+    public void setPatientPassword(String patientPassword) {
+        this.patientPassword = patientPassword;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public LocalDate getDob() {

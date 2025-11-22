@@ -8,8 +8,8 @@ import POJOS.Symptoms;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,23 +36,34 @@ public class SendDataViaNetwork {
     }
 
     public void sendPatient(Patient patient) throws IOException{
+        dataOutputStream.writeInt(patient.getPatientId());
+        dataOutputStream.writeInt(patient.getUserId());
+        dataOutputStream.writeInt(patient.getDoctorId());
+        dataOutputStream.writeUTF(patient.getPatientPassword());
         dataOutputStream.writeUTF(patient.getFullName());
         dataOutputStream.writeUTF(patient.getDob().toString());
-        dataOutputStream.writeUTF(patient.getEmail());
-        dataOutputStream.writeUTF(patient.getPassword());
+        sendReports(patient.getReports());
         dataOutputStream.flush();
-
     }
 
-    public void sendReport(Report report) throws IOException{
-        dataOutputStream.writeUTF(report.getReportId());
-        sendPatient(report.getPatient());
-        dataOutputStream.writeUTF(report.getReportDate().toString());
-        dataOutputStream.writeUTF(report.getPatientObservation());
-        dataOutputStream.writeUTF(report.getDoctorObservation());
-        sendSymptoms(report.getSymptoms());
-        sendSignals(report.getSignals());
+    public void sendPatientRegister(Patient patient) throws IOException{
+        dataOutputStream.writeUTF(patient.getPatientPassword());
+        dataOutputStream.writeUTF(patient.getFullName());
+        dataOutputStream.writeUTF(patient.getDob().toString());
         dataOutputStream.flush();
+    }
+
+    public void sendReports(List<Report> reports) throws IOException{
+        for (Report r : reports) {
+            dataOutputStream.writeInt(r.getReportId());
+            dataOutputStream.writeInt(r.getPatientId());
+            dataOutputStream.writeUTF(r.getReportDate().toString());
+            sendSymptoms(r.getSymptoms());
+            sendSignals(r.getSignals());
+            dataOutputStream.writeUTF(r.getPatientObservation());
+            dataOutputStream.writeUTF(r.getDoctorObservation());
+            dataOutputStream.flush();
+        }
     }
     public void sendSymptoms(List<Symptoms> symptoms) throws IOException{
         StringBuilder sb = new StringBuilder();
@@ -67,12 +78,20 @@ public class SendDataViaNetwork {
         dataOutputStream.writeUTF(sb.toString());
     }
 
-    public void sendSignals(Set<Signal> signals) throws IOException{
+    public void sendSignals(List<Signal> signals) throws IOException{
         dataOutputStream.writeInt(signals.size());
+
         for (Signal signal : signals) {
-            dataOutputStream.writeUTF(signal.getSignalType().name());  // enum
-            dataOutputStream.writeUTF(signal.getSignalId());           // id
-            dataOutputStream.writeUTF(signal.floatValuesToString());        // lista de floats → string
+            dataOutputStream.writeInt(signal.getSignalId());
+            dataOutputStream.writeUTF(signal.getSignalType().name());
+            sendListOfIntegerValues(signal.getValues());
+        }
+    }
+
+    public void sendListOfIntegerValues(List<Integer> values) throws IOException{
+        dataOutputStream.writeInt(values.size());
+        for (Integer value : values) {
+            dataOutputStream.writeInt(value);
         }
     }
 
@@ -86,5 +105,4 @@ public class SendDataViaNetwork {
             Logger.getLogger(SendDataViaNetwork.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
 }

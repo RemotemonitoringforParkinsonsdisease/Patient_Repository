@@ -7,48 +7,43 @@ import java.util.Random;
 import java.util.Set;
 
 public class Report {
-    private String reportId;
-    private Patient patient;
+    private Integer reportId;
+    private Integer patientId;
     private LocalDate reportDate;
-    private String patientObservation;//El texto que le manda el paciente al doctor
-    private List<Symptoms> symptoms; //Sintomas de una lista cerrada
-    private Set<Signal> signals; //La señal grabada por el bitalino del paciente, supongo que seran varios canales, puede ser un Set / List de String, hay que mirar tipo de datos del Bitalino
+    private List<Signal> signals;
+    private List<Symptoms> symptoms;
+    private String patientObservation;
     private String doctorObservation;
 
-
-    public Report(String reportId, Patient patient, LocalDate reportDate, String patientObservation, List<Symptoms> symptoms, Set<Signal> signals, String doctorObservation) {
+    public Report(Integer reportId, Integer patientId, LocalDate reportDate, List<Signal> signals, List<Symptoms> symptoms, String patientObservation, String doctorObservation) {
         this.reportId = reportId;
-        this.patient = patient;
+        this.patientId = patientId;
         this.reportDate = reportDate;
-        this.patientObservation = patientObservation;
-        this.symptoms = symptoms;
         this.signals = signals;
-        this.doctorObservation = doctorObservation;
-    }
-
-    public Report(Patient patient, LocalDate reportDate, String patientObservation, String doctorObservation, List<Symptoms> symptoms, Set<Signal> signals) {
-        this.patient = patient;
-        this.reportDate = reportDate;
+        this.symptoms = symptoms;
         this.patientObservation = patientObservation;
         this.doctorObservation = doctorObservation;
-        this.symptoms = symptoms;
-        this.signals = signals;
     }
 
-    public String getReportId() {
-        return reportId;
+    public Report(Integer reportId, Integer patientId, LocalDate reportDate, String patientObservation, String doctorObservation) {
+        this.reportId = reportId;
+        this.patientId = patientId;
+        this.reportDate = reportDate;
+        this.patientObservation = patientObservation;
     }
 
-    public void setReportId(String reportId) {
+    public Integer getReportId() { return reportId; }
+
+    public void setReportId(Integer reportId) {
         this.reportId = reportId;
     }
 
-    public Patient getPatient() {
-        return patient;
+    public Integer getPatientId() {
+        return patientId;
     }
 
-    public void setPatient(Patient patient) {
-        this.patient = patient;
+    public void setPatientId(Integer patientId) {
+        this.patientId = patientId;
     }
 
     public LocalDate getReportDate() {
@@ -59,12 +54,12 @@ public class Report {
         this.reportDate = reportDate;
     }
 
-    public String getPatientObservation() {
-        return patientObservation;
+    public List<Signal> getSignals() {
+        return signals;
     }
 
-    public void setPatientObservation(String patientObservation) {
-        this.patientObservation = patientObservation;
+    public void setSignals(List<Signal> signals) {
+        this.signals = signals;
     }
 
     public List<Symptoms> getSymptoms() {
@@ -75,12 +70,12 @@ public class Report {
         this.symptoms = symptoms;
     }
 
-    public Set<Signal> getSignals() {
-        return signals;
+    public String getPatientObservation() {
+        return patientObservation;
     }
 
-    public void setSignals(Set<Signal> signals) {
-        this.signals = signals;
+    public void setPatientObservation(String patientObservation) {
+        this.patientObservation = patientObservation;
     }
 
     public String getDoctorObservation() {
@@ -89,5 +84,14 @@ public class Report {
 
     public void setDoctorObservation(String doctorObservation) {
         this.doctorObservation = doctorObservation;
+    }
+
+    public Signal getSignalByType(SignalType signalType){
+        for(Signal signal : signals){
+            if(signal.getSignalType() ==  signalType){
+                return signal;
+            }
+        }
+        return null;
     }
 }
