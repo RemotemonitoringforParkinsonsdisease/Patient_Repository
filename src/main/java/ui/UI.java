@@ -122,42 +122,44 @@ public class UI {
     }
 
     private void loginMenu() throws IOException {
-        System.out.println("\n-----PATIENT LOGIN MENU-----\n");
-
-        String email;
-        boolean valid;
         do {
-            email = Utilities.readString("Enter your email: ");
-            valid = Utilities.checkEmail(email);
+            System.out.println("\n-----PATIENT LOGIN MENU-----\n");
 
-            if (!valid) {
-                System.out.println("Please follow the email format: example@example.com\n");
-            }
-        } while (!valid);
-
-        connection.getSendViaNetwork().sendStrings(email);
-        String emailVerification = connection.getReceiveViaNetwork().receiveString();
-
-        if (emailVerification.equals("EMAIL OK")) {
-            String password;
+            String email;
+            boolean valid;
             do {
-                password = Utilities.readString("Enter your password: ");
-                if (password == null || password.isEmpty()) {
-                    System.out.println("Password cannot be empty.\n");
+                email = Utilities.readString("Enter your email: ");
+                valid = Utilities.checkEmail(email);
+
+            } while (!valid);
+
+            connection.getSendViaNetwork().sendStrings(email);
+            String emailVerification = connection.getReceiveViaNetwork().receiveString();
+
+            if (emailVerification.equals("EMAIL OK")) {
+                String password;
+                do {
+                    password = Utilities.readString("Enter your password: ");
+                    if (password == null || password.isEmpty()) {
+                        System.out.println("Password cannot be empty.\n");
+                    }
+                } while (password == null || password.isEmpty());
+
+                connection.getSendViaNetwork().sendStrings(password);
+                String passwordVerification = connection.getReceiveViaNetwork().receiveString();
+
+                if (passwordVerification.equals("PASSWORD OK")) {
+                    System.out.println("Login successful!\n");
+                    this.loggedMenu();
+                } else {
+                    System.out.println("Login failed. Incorrect email or password.\n");
+                    loginMenu();
                 }
-            } while (password == null || password.isEmpty());
-
-            connection.getSendViaNetwork().sendStrings(password);
-            String passwordVerification = connection.getReceiveViaNetwork().receiveString();
-
-            if (passwordVerification.equals("PASSWORD OK")) {
-                System.out.println("Login successful!\n");
-                loggedMenu();
             } else {
-                System.out.println("Login failed. Incorrect email or password.\n");
-                loginMenu();
+                System.out.println(emailVerification);
+                return;
             }
-        }
+        } while (true);
     }
 
     private void loggedMenu() throws IOException {
