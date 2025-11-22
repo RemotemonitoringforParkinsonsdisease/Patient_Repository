@@ -22,6 +22,11 @@ public class Signal {
         this.signalType = signalType;
     }
 
+    public Signal(SignalType signalType) {
+        this.signalType = signalType;
+        this.values = new ArrayList<>();
+    }
+
     public Signal(Integer signalId, SignalType signalType, List<Integer> values) {
         this.signalId = signalId;
         this.signalType = signalType;

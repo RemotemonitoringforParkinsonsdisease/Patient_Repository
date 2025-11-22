@@ -25,6 +25,15 @@ public class Report {
         this.doctorObservation = doctorObservation;
     }
 
+    public Report(Integer patientId, LocalDate reportDate, String patientObservation, String doctorObservation, List<Symptoms> symptoms, List<Signal> signals) {
+        this.patientId = patientId;
+        this.reportDate = reportDate;
+        this.patientObservation = patientObservation;
+        this.doctorObservation = doctorObservation;
+        this.symptoms = symptoms;
+        this.signals = signals;
+    }
+
     public Report(Integer reportId, Integer patientId, LocalDate reportDate, String patientObservation, String doctorObservation) {
         this.reportId = reportId;
         this.patientId = patientId;

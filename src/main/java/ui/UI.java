@@ -198,12 +198,14 @@ public class UI {
         System.out.println("Date of birth: " + patient.getDob());
 
         if (patient.getDoctorId() != null) {
-            //Doctor
-            System.out.println("Your assigned doctor: " + patient.getDoctor().getFullName());
+            connection.getSendViaNetwork().sendInt(patient.getDoctorId());
+            Doctor doctor = connection.getReceiveViaNetwork().receiveDoctor();
+            System.out.println("Your assigned doctor is: " + doctor.getFullName());
         }
         System.out.println("\nPress ENTER to go back to the main menu...");
         Utilities.readString("");
-        this.loggedMenu(patient);
+        //loggedMenu(patient);
+        loggedMenu();
     }
 
     //TODO
@@ -215,7 +217,8 @@ public class UI {
             System.out.println("You don't have any reports yet!\n");
             System.out.println("\nPress ENTER to go back to the main menu...");
             Utilities.readString("");
-            this.loggedMenu(patient);
+            //this.loggedMenu(patient);
+            this.loggedMenu();
         }
 
         //ordenamos por fechas, pero en verdad ya estarán ordenadas no??
@@ -234,7 +237,8 @@ public class UI {
         }
         System.out.println("\nPress ENTER to go back...");
         Utilities.readString("");
-        this.loggedMenu(patient);
+        //this.loggedMenu(patient);
+        this.loggedMenu();
     }
 
     private void createReport(Patient patient) throws IOException {
@@ -271,7 +275,7 @@ public class UI {
         }
 
         System.out.println("\n-----SIGNAL CAPTURE-----");
-        Set<Signal> signals = new HashSet<>();
+        List<Signal> signals = new ArrayList<>();
 
         int index2 = 1;
         for (SignalType type : SignalType.values()) {
@@ -299,8 +303,8 @@ public class UI {
             }
         }
 
-        Report report = new Report(patient, reportDate, patientObservations, null, selectedSymptoms, signals);
-        connection.getSendViaNetwork().sendReports(report);
+        Report report = new Report(patient.getPatientId(), reportDate, patientObservations, null, selectedSymptoms, signals);
+        connection.getSendViaNetwork().sendReport(report);
     }
 
     private Signal captureBitalinoSignal(SignalType type) {
@@ -311,9 +315,7 @@ public class UI {
         //Canal traducido del tipo de señal que le pasamos
         int channel = mapSignalTypeToChannel(type);
 
-        //Crear ID único para la señal (NO ENTIENDO Q POLLAS HACE ESTO)
-        String signalId = type + "_" + System.currentTimeMillis();
-        Signal signal = new Signal(type, signalId);
+        Signal signal = new Signal(type);
 
         try {
 
@@ -332,7 +334,7 @@ public class UI {
 
             //Guarda valores en la señal
             for (Frame frame : frames) {
-                float value = frame.analog[channel];
+                int value = frame.analog[channel];
                 signal.getValues().add(value);
             }
 
