@@ -34,13 +34,6 @@ public class Report {
         this.signals = signals;
     }
 
-    public Report(Integer reportId, Integer patientId, LocalDate reportDate, String patientObservation, String doctorObservation) {
-        this.reportId = reportId;
-        this.patientId = patientId;
-        this.reportDate = reportDate;
-        this.patientObservation = patientObservation;
-    }
-
     public Integer getReportId() { return reportId; }
 
     public void setReportId(Integer reportId) {
