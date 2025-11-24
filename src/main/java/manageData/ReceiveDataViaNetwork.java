@@ -119,10 +119,9 @@ public class ReceiveDataViaNetwork {
                 Integer signalId = dataInputStream.readInt();
                 String typeSignal = dataInputStream.readUTF();
                 SignalType signalType = SignalType.valueOf(typeSignal);
-                String valuesString = dataInputStream.readUTF();
-                Signal signal = new Signal(signalId, signalType);
-                //Esto recibe la lista completa de valores de la señal
-                signal.stringToIntValues(valuesString);
+                Integer samplingRate = dataInputStream.readInt();
+                List<Integer> values = receiveListOfIntegerValues();
+                Signal signal = new Signal(signalId, signalType, samplingRate, values);
                 signals.add(signal);
             }
             return signals;
@@ -132,6 +131,18 @@ public class ReceiveDataViaNetwork {
         return signals;
     }
 
+    public List<Integer> receiveListOfIntegerValues() throws IOException {
+        List<Integer> values = new ArrayList<>();
+        int numValues = dataInputStream.readInt();
+        if (numValues == 0) {
+            return values;
+        }
+        for (int i = 0; i < numValues; i++) {
+            Integer value = dataInputStream.readInt();
+            values.add(value);
+        }
+        return values;
+    }
 
     public List<Symptoms> receiveSymptoms() throws IOException{
         List<Symptoms> symptoms = new ArrayList<>();

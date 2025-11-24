@@ -96,6 +96,7 @@ public class SendDataViaNetwork {
         for (Signal signal : signals) {
             dataOutputStream.writeInt(signal.getSignalId());
             dataOutputStream.writeUTF(signal.getSignalType().name());
+            dataOutputStream.writeInt(signal.getSamplingRate());
             sendListOfIntegerValues(signal.getValues());
         }
     }

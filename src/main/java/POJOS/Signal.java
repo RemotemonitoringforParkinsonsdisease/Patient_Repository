@@ -17,22 +17,17 @@ public class Signal {
     private List<Integer> values;
     private Integer samplingRate;
 
-    public Signal(Integer signalId, SignalType signalType) {
-        this.signalId = signalId;
-        this.signalType = signalType;
-    }
-
     public Signal(SignalType signalType) {
         this.signalType = signalType;
         this.values = new ArrayList<>();
     }
 
-    public Signal(Integer signalId, SignalType signalType, List<Integer> values) {
+    public Signal(Integer signalId, SignalType signalType, Integer samplingRate, List<Integer> values) {
         this.signalId = signalId;
         this.signalType = signalType;
+        this.samplingRate = samplingRate;
         this.values = values;
     }
-
 
     public Integer getSignalId() {
         return signalId;
