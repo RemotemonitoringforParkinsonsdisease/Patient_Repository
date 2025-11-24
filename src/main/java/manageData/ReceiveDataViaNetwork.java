@@ -42,6 +42,9 @@ public class ReceiveDataViaNetwork {
         List<Report> reports = new ArrayList<>();
         try {
             int numberOfReports = dataInputStream.readInt();
+            if (numberOfReports == 0) {
+                return reports; //devolvemos lista vacía sin intentar leer nada
+            }
             for (int i = 0; i < numberOfReports; i++) {
                 reports.add(receiveReport());
             }
