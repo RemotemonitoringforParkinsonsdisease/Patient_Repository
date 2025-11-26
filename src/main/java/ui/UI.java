@@ -374,11 +374,11 @@ public class UI {
     //Los tipos de señal están asignados a los canales de la placa de bitalino
     private int mapSignalTypeToChannel(SignalType type) {
         switch (type) {
-            case ECG: return 0;
-            case EMG: return 1;
+            case ECG: return 1;
+            case EMG: return 0;
             case EDA: return 2;
             case ACC: return 3; // eje X, por ejemplo
-            default: return 0;
+            default: return 444;
         }
     }
 
