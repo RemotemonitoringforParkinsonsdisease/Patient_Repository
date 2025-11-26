@@ -60,7 +60,6 @@ public class SendDataViaNetwork {
     }
 
     public void sendReport(Report r) throws IOException{
-        dataOutputStream.writeInt(r.getReportId());
         dataOutputStream.writeInt(r.getPatientId());
         dataOutputStream.writeUTF(r.getReportDate().toString());
         sendSymptoms(r.getSymptoms());

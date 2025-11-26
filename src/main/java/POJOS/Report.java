@@ -14,6 +14,7 @@ public class Report {
     private List<Symptoms> symptoms;
     private String patientObservation;
     private String doctorObservation;
+    private String csvFilePath;
 
     public Report(Integer reportId, Integer patientId, LocalDate reportDate, List<Signal> signals, List<Symptoms> symptoms, String patientObservation, String doctorObservation) {
         this.reportId = reportId;
@@ -96,4 +97,25 @@ public class Report {
         }
         return null;
     }
+
+    public String getCsvFilePath() {
+        return csvFilePath;
+    }
+
+    public void setCsvFilePath(String csvFilePath) {
+        this.csvFilePath = csvFilePath;
+    }
+
+    @Override
+    public String toString() {
+        return "Report{" +
+                "reportId=" + reportId +
+                ", patientId=" + patientId +
+                ", reportDate=" + reportDate +
+                ", symptoms=" + symptoms +
+                ", signals=" + signals.size() +
+                ", csvFilePath='" + csvFilePath + '\'' +
+                '}';
+    }
+
 }

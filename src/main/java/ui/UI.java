@@ -4,9 +4,15 @@ import BITalino.*;
 import POJOS.*;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class UI {
     private Connection connection;
@@ -274,6 +280,9 @@ public class UI {
 
             System.out.println(chosenSymptom + ", added.");
         }
+        // ------------------ CREAR ARCHIVO CSV DEL REPORT ------------------
+        String csvFilePath = createReportCSVFile(reportDate);
+        System.out.println("CSV file created at: " + csvFilePath);
 
         System.out.println("\n-----SIGNAL CAPTURE-----");
         List<Signal> signals = new ArrayList<>();
@@ -300,11 +309,16 @@ public class UI {
             Signal signal = captureBitalinoSignal(signalType);
 
             if (signal != null) {
+                appendSignalToCSV(csvFilePath, signal);
                 signals.add(signal);
+                System.out.println(signalType + " appended to file.\n");
             }
         }
 
         Report report = new Report(patient.getPatientId(), reportDate, patientObservations, null, selectedSymptoms, signals);
+        report.setCsvFilePath(csvFilePath);
+        System.out.println(report);
+
         connection.getSendViaNetwork().sendReport(report);
         String verificationReport = connection.getReceiveViaNetwork().receiveString();
         System.out.println(verificationReport);
@@ -367,6 +381,38 @@ public class UI {
             default: return 0;
         }
     }
+
+
+    // -------------------------------------------------------------------------------------
+    //                           ARCHIVOS CSV DE SEÑALES
+    // -------------------------------------------------------------------------------------
+
+    //crea un archivo
+    public String createReportCSVFile(LocalDate date) throws IOException {
+        String folder = "signals/";
+        Files.createDirectories(Paths.get(folder));
+        String fileName = "report_" +  date.toString() + ".csv";
+        Path path = Paths.get(folder + fileName);
+
+        Files.writeString(path, "");  // archivo vacío
+        return path.toString();
+    }
+
+    //añade una señal al archivo ya creado
+    public void appendSignalToCSV(String filePath, Signal signal) throws IOException {
+
+        String header = signal.getSignalType().name() + ": ";
+
+        String values = signal.getValues()
+                .stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(","));
+
+        String line = header + values + "\n";
+
+        Files.write(Paths.get(filePath), line.getBytes(), StandardOpenOption.APPEND);
+    }
+
 
     private void exitMenu(){
         System.out.println("\nClosing the application...");
