@@ -13,9 +13,7 @@ public class UI {
 
     public static void main(String[] args) throws IOException {
         UI ui = new UI();
-
         ui.startConnection();
-        ui.preLoggedMenu();
     }
 
     private void startConnection() {

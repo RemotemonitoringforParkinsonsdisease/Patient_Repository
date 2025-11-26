@@ -2,6 +2,8 @@ package ui;
 
 import manageData.ReceiveDataViaNetwork;
 import manageData.SendDataViaNetwork;
+
+import java.io.IOException;
 import java.net.Socket;
 
 public class Connection {
@@ -14,8 +16,9 @@ public class Connection {
             this.socket = new Socket(ipAddress, port);
             this.sendDataViaNetwork = new SendDataViaNetwork(socket);
             this.receiveDataViaNetwork = new ReceiveDataViaNetwork(socket);
-        } catch (Exception e) {
-            System.out.println("Error establishing connection to " + ipAddress + " on port " + port); //TODO: Revisar excepciones
+        } catch (IOException e) {
+            System.out.println("Error establishing connection to " + ipAddress + " on port " + port);
+            e.printStackTrace(); // Muestra más detalles sobre el error (como el tipo exacto de excepción)
         }
     }
 
