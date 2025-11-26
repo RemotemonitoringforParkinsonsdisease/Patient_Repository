@@ -15,15 +15,10 @@ import java.util.logging.Logger;
 public class SendDataViaNetwork {
     private DataOutputStream dataOutputStream;
 
-    public SendDataViaNetwork(Socket socket) {
-        try{
-            this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
-        } catch (IOException e) {
-            System.err.println("Output stream could not be created: " + e.getMessage());
-            Logger.getLogger(SendDataViaNetwork.class.getName()).log(Level.SEVERE, null, e);
-        }
-
+    public SendDataViaNetwork(DataOutputStream dos) {
+        this.dataOutputStream = dos;
     }
+
     public void sendStrings(String message) throws IOException {
         dataOutputStream.writeUTF(message);
         dataOutputStream.flush();

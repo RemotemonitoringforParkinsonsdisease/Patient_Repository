@@ -3,56 +3,49 @@ package ui;
 import manageData.ReceiveDataViaNetwork;
 import manageData.SendDataViaNetwork;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
 public class Connection {
-    private Socket socket;
-    private SendDataViaNetwork sendDataViaNetwork;
-    private ReceiveDataViaNetwork receiveDataViaNetwork;
+
+    private final Socket socket;
+    private final DataInputStream in;
+    private final DataOutputStream out;
+
+    private final SendDataViaNetwork send;
+    private final ReceiveDataViaNetwork receive;
 
     public Connection(String ipAddress, int port) {
         try {
             this.socket = new Socket(ipAddress, port);
-            this.sendDataViaNetwork = new SendDataViaNetwork(socket);
-            this.receiveDataViaNetwork = new ReceiveDataViaNetwork(socket);
+            this.in = new DataInputStream(socket.getInputStream());
+            this.out = new DataOutputStream(socket.getOutputStream());
+
+            this.send = new SendDataViaNetwork(out);
+            this.receive = new ReceiveDataViaNetwork(in);
+
         } catch (IOException e) {
-            System.out.println("Error establishing connection to " + ipAddress + " on port " + port);
-            e.printStackTrace(); // Muestra más detalles sobre el error (como el tipo exacto de excepción)
+            throw new RuntimeException(e);
         }
     }
 
     public SendDataViaNetwork getSendViaNetwork() {
-        return sendDataViaNetwork;
+        return send;
     }
 
     public ReceiveDataViaNetwork getReceiveViaNetwork() {
-        return receiveDataViaNetwork;
+        return receive;
     }
 
     public void releaseResources() {
         try {
-            if (sendDataViaNetwork != null) {
-                sendDataViaNetwork.releaseResources();  // o close(), según lo hayas llamado
-            }
-        } catch (Exception e) {
-            System.out.println("Error releasing sendDataViaNetwork: " + e.getMessage());
-        }
-
-        try {
-            if (receiveDataViaNetwork != null) {
-                receiveDataViaNetwork.releaseResources(); // o close()
-            }
-        } catch (Exception e) {
-            System.out.println("Error releasing receiveDataViaNetwork: " + e.getMessage());
-        }
-
-        try {
-            if (socket != null && !socket.isClosed()) {
-                socket.close();
-            }
-        } catch (Exception e) {
-            System.out.println("Error closing socket: " + e.getMessage());
+            in.close();
+            out.close();
+            socket.close();
+        } catch (IOException ignored){
+            ignored.printStackTrace();
         }
     }
 }
