@@ -24,6 +24,8 @@ public class BitalinoDemo {
 
         return device;
     }
+
+    /*
     //TODO HACER PARA LAS DEMAS SEÑALES
     public void acquireEMGfromBITalino(ClientConnection connection, int clientId) {
 
@@ -64,6 +66,7 @@ public class BitalinoDemo {
             throw new RuntimeException(e);
         }
     }
+
+     */
 }
 
-}
