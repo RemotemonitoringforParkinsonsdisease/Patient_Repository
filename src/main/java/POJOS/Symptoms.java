@@ -1,68 +1,19 @@
 package POJOS;
 
 public enum Symptoms {
-    // Motor Symptoms
-    TREMOR_REST,
-    BRADYKINESIA,
-    RIGIDITY,
-    POSTURAL_INSTABILITY,
-    FREEZING_OF_GAIT,
-    SHUFFLING_GAIT,
-    MICROGRAPHIA,
-    HYPOMIMIA,
-    REDUCED_ARM_SWING,
-    MOVEMENT_INITIATION_DIFFICULTY,
-    TURNING_DIFFICULTY,
-    DYSARTHRIA,
-    DYSPHAGIA,
-
-    // Secondary Motor Symptoms
-    DYSTONIA,
-    MUSCLE_CRAMPS,
-    FATIGUE,
-    SLOW_EYE_MOVEMENTS,
-    MUSCULOSKELETAL_PAIN,
-    STOOPED_POSTURE,
-    DYSKINESIA,
-
-    // Autonomic Symptoms
-    ORTHOSTATIC_HYPOTENSION,
-    ABNORMAL_SWEATING,
-    TEMPERATURE_INTOLERANCE,
-    CONSTIPATION,
-    URINARY_PROBLEMS,
-    SEXUAL_DYSFUNCTION,
-    AUTONOMIC_CARDIAC_DYSFUNCTION,
-
-    // Sensory Symptoms
-    ANOSMIA,
-    GENERAL_PAIN,
-    TINGLING,
-    PROPRIOCEPTION_ISSUES,
-
-    // Cognitive Symptoms
-    EXECUTIVE_DYSFUNCTION,
-    BRADYPHRENIA,
-    ATTENTION_PROBLEMS,
-    MEMORY_PROBLEMS,
-    DEMENTIA,
-
-    // Mood Symptoms
-    DEPRESSION,
-    ANXIETY,
-    APATHY,
-    IRRITABILITY,
-
-    // Sleep Symptoms
-    REM_SLEEP_BEHAVIOR_DISORDER,
-    INSOMNIA,
-    EXCESSIVE_DAYTIME_SLEEPINESS,
-    RESTLESS_LEGS,
-    FRAGMENTED_SLEEP,
-
-    // Voice / Speech Symptoms
-    HYPOPHONIA,
-    MONOTONE_VOICE,
-    RAPID_SPEECH,
-    ARTICULATION_PROBLEMS
+    TREMOR,                // Temblor
+    SLOW_MOVEMENT,         // Movimiento lento
+    STIFF_MUSCLES,         // Músculos rígidos
+    DIFFICULTY_WITH_BALANCE, // Dificultad con el equilibrio
+    SHUFFLING_WALK,        // Caminata arrastrando los pies
+    SMALL_HANDWRITING,     // Escritura pequeña
+    SOFT_VOICE,            // Voz suave
+    DIFFICULTY_SWALLOWING, // Dificultad para tragar
+    CONSTIPATION,          // Estreñimiento
+    DIZZINESS_OR_FAINTING, // Mareos o desmayos
+    SLEEP_PROBLEMS,        // Problemas de sueño
+    DEPRESSION,            // Depresión
+    ANXIETY,               // Ansiedad
+    REDUCED_FACIAL_EXPRESSION, // Expresión facial reducida
+    BLADDER_PROBLEMS       // Problemas de vejiga
 }
