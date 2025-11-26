@@ -313,7 +313,7 @@ public class UI {
     private Signal captureBitalinoSignal(SignalType type) {
         //TODO mirar excepciones posibles
         System.out.println("\nConnecting to BITalino...");
-        String mac = "98:D3:91:FD:69:4F";  //Cambiar por el nuestro
+        String mac = "BC:33:AC:AB:AE:E5";  //Cambiar por el nuestro
 
         //Canal traducido del tipo de señal que le pasamos
         int channel = mapSignalTypeToChannel(type);

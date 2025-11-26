@@ -49,7 +49,6 @@ public class SendDataViaNetwork {
 
     public void sendReports(List<Report> reports) throws IOException{
         for (Report r : reports) {
-            dataOutputStream.writeInt(r.getReportId());
             dataOutputStream.writeInt(r.getPatientId());
             dataOutputStream.writeUTF(r.getReportDate().toString());
             sendSymptoms(r.getSymptoms());
@@ -89,7 +88,6 @@ public class SendDataViaNetwork {
         dataOutputStream.writeInt(signals.size());
 
         for (Signal signal : signals) {
-            dataOutputStream.writeInt(signal.getSignalId());
             dataOutputStream.writeUTF(signal.getSignalType().name());
             dataOutputStream.writeInt(signal.getSamplingRate());
             sendListOfIntegerValues(signal.getValues());
