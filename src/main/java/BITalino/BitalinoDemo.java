@@ -1,7 +1,5 @@
 package BITalino;
 
-import POJOS.Signal;
-import POJOS.SignalType;
 import ui.Utilities;
 
 import java.awt.image.SampleModel;
@@ -13,9 +11,7 @@ public class BitalinoDemo {
     private static final int SAMPLES = 500;
 
 
-   /*
     private BITalino connectToBitalino() throws InterruptedException {
-
 
         BITalino bitalino = new BITalino();
 
@@ -68,52 +64,6 @@ public class BitalinoDemo {
             throw new RuntimeException(e);
         }
     }
-
-    public void acquireECGfromBITalino(ClientConnection connection, int clientId) {
-
-        try {
-            // Conectar BITalino
-            BITalino device = connectToBitalino();
-
-            // ECG = canal físico 2 -> indice 1
-            int[] channelsToAcquire = {1};
-            device.start(channelsToAcquire);
-
-            List<Integer> samples = new ArrayList<>();
-
-            // Lee 200 muestras
-            int remaining = SAMPLES;
-            while (remaining > 0) {
-
-                Frame[] frames = device.read(Math.min(10, remaining));
-
-                for (Frame f : frames) {
-                    samples.add(f.analog[0]); // 1 canal → analog[0]
-                }
-
-                remaining -= frames.length;
-            }
-
-            // Para
-            device.stop();
-            device.close();
-
-            // Crea la señal para el servidor
-            Signal s = new Signal(SignalType.ECG, clientId);
-            samples.forEach(s::addSample);
-
-            connection.sendSignalFromBITalino(s);
-
-            System.out.println("ECG sent to server (" + samples.size() + " samples)");
-
-        } catch (Exception e) {
-            System.out.println("Error acquiring ECG: " + e.getMessage());
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    */
-
 }
 
+}
