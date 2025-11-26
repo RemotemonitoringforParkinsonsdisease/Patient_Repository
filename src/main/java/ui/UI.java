@@ -350,6 +350,7 @@ public class UI {
 
         } catch (Exception e) {
             System.out.println("Error capturing " + type + " signal: " + e.getMessage());
+            e.printStackTrace();
             return null;
         } catch (Throwable e) {
             throw new RuntimeException(e);
