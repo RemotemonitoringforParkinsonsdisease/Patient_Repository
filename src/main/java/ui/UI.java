@@ -223,25 +223,24 @@ public class UI {
         if (reports == null || reports.isEmpty()) {
             System.out.println("You don't have any reports yet!\n");
             return;
-        }
+        } else {
+            //ordenamos por fechas, pero en verdad ya estarán ordenadas no??
+            reports.sort((r1, r2) -> r2.getReportDate().compareTo(r1.getReportDate()));
 
-        //ordenamos por fechas, pero en verdad ya estarán ordenadas no??
-        reports.sort((r1, r2) -> r2.getReportDate().compareTo(r1.getReportDate()));
+            for (int i = 0; i < reports.size(); i++) {
+                Report report = reports.get(i);
+                System.out.println("\n-----REPORT nº: " + (i+1) + " with date: " + report.getReportDate() + "-----\n");
+                System.out.println("Patient Observation: " + report.getPatientObservation());
+                System.out.println("Doctor Observation: " + report.getDoctorObservation());
+                System.out.println("Symptoms:");
 
-        for (int i = 0; i < reports.size(); i++) {
-            Report report = reports.get(i);
-            System.out.println("\n-----REPORT nº: " + (i+1) + " with date: " + report.getReportDate() + "-----\n");
-            System.out.println("Patient Observation: " + report.getPatientObservation());
-            System.out.println("Doctor Observation: " + report.getDoctorObservation());
-            System.out.println("Symptoms:");
-
-            for (int j = 0; j < report.getSymptoms().size(); j++) {
-                System.out.println(" - " + report.getSymptoms().get(i));
+                for (int j = 0; j < report.getSymptoms().size(); j++) {
+                    System.out.println(" - " + report.getSymptoms().get(i));
+                }
             }
+            Utilities.readInteger("Press 0 to go back to the main menu...");
+            this.loggedInMenu();
         }
-        System.out.println("\nPress ENTER to go back...");
-        Utilities.readString("");
-        this.loggedInMenu();
     }
 
     private void createReport(Patient patient) throws IOException {
@@ -272,17 +271,25 @@ public class UI {
             //Resta 1 porque el menú empieza en 1 pero el array en 0
             Symptoms chosenSymptom = Symptoms.values()[choice-1];
             selectedSymptoms.add(chosenSymptom);
-
             System.out.println(chosenSymptom + ", added.");
         }
 
         //creamos el archivo de señales
         String csvFilePath = manageFiles.createSignalsCSVFile(reportDate);
         System.out.println("CSV file created at: " + csvFilePath);
+        signalMenu(csvFilePath);
 
+        Report report = new Report(patient.getPatientId(), reportDate, patientObservations, "", selectedSymptoms, csvFilePath);
+        //report.setSignalsFilePath(csvFilePath);
+        System.out.println(report);
+
+        connection.getSendViaNetwork().sendReport(report);
+        String verificationReport = connection.getReceiveViaNetwork().receiveString();
+        System.out.println(verificationReport);
+    }
+
+    public void signalMenu(String csvFilePath) throws IOException {
         System.out.println("\n-----SIGNAL CAPTURE-----");
-        //List<Signal> signals = new ArrayList<>();
-
         int index2 = 1;
         for (SignalType type : SignalType.values()) {
             System.out.println(index2 + ") " + type);
@@ -307,19 +314,10 @@ public class UI {
             if (signal != null) {
                 //Pasamos la señal grabada al archivo CSV creado antes (línea 284)
                 manageFiles.appendSignalToCSV(csvFilePath, signal);
-                //signals.add(signal);
                 System.out.println(signalType + " appended to file.\n");
-
+                return;
             }
         }
-
-        Report report = new Report(patient.getPatientId(), reportDate, patientObservations, "", selectedSymptoms, csvFilePath);
-        //report.setSignalsFilePath(csvFilePath);
-        System.out.println(report);
-
-        connection.getSendViaNetwork().sendReport(report);
-        String verificationReport = connection.getReceiveViaNetwork().receiveString();
-        System.out.println(verificationReport);
     }
 
     private void exitMenu(){
