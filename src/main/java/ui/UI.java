@@ -234,8 +234,8 @@ public class UI {
                 System.out.println("Doctor Observation: " + report.getDoctorObservation());
                 System.out.println("Symptoms:");
 
-                for (int j = 0; j < report.getSymptoms().size(); j++) {
-                    System.out.println(" - " + report.getSymptoms().get(i));
+                for (Symptoms s : report.getSymptoms()) {
+                    System.out.println(s);
                 }
             }
 
