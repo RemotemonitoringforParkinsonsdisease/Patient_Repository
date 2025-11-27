@@ -238,8 +238,15 @@ public class UI {
                     System.out.println(" - " + report.getSymptoms().get(i));
                 }
             }
-            Utilities.readInteger("Press 0 to go back to the main menu...");
-            this.loggedInMenu();
+
+            int response = Utilities.readInteger("Press 0 to go back to the main menu...");
+            do {
+                if (response == 0) {
+                    this.loggedInMenu();
+                } else {
+                    System.out.println("Introduce a valid option.\n");
+                }
+            } while (true);
         }
     }
 
