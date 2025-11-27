@@ -323,7 +323,7 @@ public class UI {
                 //Pasamos la señal grabada al archivo CSV creado antes (línea 284)
                 manageFiles.appendSignalToCSV(csvFilePath, signal);
                 System.out.println(signalType + " appended to file.\n");
-                return;
+                break;
             }
         }
     }
