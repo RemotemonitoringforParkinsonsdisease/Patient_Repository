@@ -327,9 +327,8 @@ public class UI {
                 System.out.println(signalType + " appended to file.\n");
             }
 
-            // Aquí está LA CLAVE:
-            String answer = Utilities.readString("Do you want to capture another signal? (y/n): ");
-            if (!answer.equalsIgnoreCase("y")) {
+            int answer = Utilities.readInteger("Do you want to capture another signal? (Press 0 to confirm and any other character to finish): ");
+            if (answer != 0) {
                 continueCapturing = false;
             }
         }
