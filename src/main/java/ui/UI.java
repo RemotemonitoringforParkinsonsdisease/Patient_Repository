@@ -49,6 +49,7 @@ public class UI {
         System.out.println("\n\n-----WELCOME TO THE PATIENT APPLICATION-----\n\n");
         int option = 0;
         do {
+            System.out.println("Vuelvo al menu");
             System.out.println("\n1) Register"
                     + "\n2) Log-in"
                     + "\n3) Exit"
@@ -83,10 +84,6 @@ public class UI {
         do {
             email = Utilities.readString("Enter your email: ");
             valid = Utilities.checkEmail(email);
-
-            if (!valid) {
-                System.out.println("Please follow the email format: example@example.com\n");
-            }
         } while (!valid);
 
         connection.getSendViaNetwork().sendStrings(email);
@@ -153,7 +150,7 @@ public class UI {
                     this.loggedInMenu();
                 } else {
                     System.out.println("Login failed. Incorrect email or password.\n");
-                    loginMenu();
+                    return;
                 }
             } else {
                 System.out.println(emailVerification);
@@ -234,11 +231,6 @@ public class UI {
                 System.out.println("Doctor Observation: " + report.getDoctorObservation());
                 System.out.println("Symptoms:");
                 System.out.println(report.getSymptoms());
-                /*for (Symptoms s : report.getSymptoms()) {
-                    System.out.println(s);
-                }
-
-                 */
             }
 
             do {
