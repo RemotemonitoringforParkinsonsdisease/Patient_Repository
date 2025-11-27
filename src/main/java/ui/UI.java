@@ -2,19 +2,17 @@ package ui;
 
 import BITalino.*;
 import POJOS.*;
+import manageFiles.*;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class UI {
     private Connection connection;
+    private ManageFiles manageFiles = new ManageFiles();
+    private BItalinoCapture bitalinoCapture = new BItalinoCapture();
 
     public static void main(String[] args) throws IOException {
         UI ui = new UI();
@@ -279,7 +277,7 @@ public class UI {
         }
 
         //creamos el archivo de señales
-        String csvFilePath = createSignalsCSVFile(reportDate);
+        String csvFilePath = manageFiles.createSignalsCSVFile(reportDate);
         System.out.println("CSV file created at: " + csvFilePath);
 
         System.out.println("\n-----SIGNAL CAPTURE-----");
@@ -304,11 +302,11 @@ public class UI {
             }
 
             SignalType signalType = SignalType.values()[choice-1];
-            Signal signal = captureBitalinoSignal(signalType);
+            Signal signal = bitalinoCapture.captureBitalinoSignal(signalType);
 
             if (signal != null) {
                 //Pasamos la señal grabada al archivo CSV creado antes (línea 284)
-                appendSignalToCSV(csvFilePath, signal);
+                manageFiles.appendSignalToCSV(csvFilePath, signal);
                 signals.add(signal);
                 System.out.println(signalType + " appended to file.\n");
             }
@@ -321,85 +319,6 @@ public class UI {
         connection.getSendViaNetwork().sendReport(report);
         String verificationReport = connection.getReceiveViaNetwork().receiveString();
         System.out.println(verificationReport);
-    }
-
-    private Signal captureBitalinoSignal(SignalType type) {
-        //TODO mirar excepciones posibles
-        System.out.println("\nConnecting to BITalino...");
-        String mac = "BC:33:AC:AB:AE:E5";  //Cambiar por el nuestro
-
-        //Canal traducido del tipo de señal que le pasamos
-        int channel = mapSignalTypeToChannel(type);
-
-        Signal signal = new Signal(type);
-
-        try {
-
-            BITalino device = new BITalino();
-
-            //Abrir conexión
-            device.open(mac, 100);
-
-            //Iniciar adquisición SOLO del canal elegido
-            device.start(new int[]{channel});
-
-            System.out.println("Recording " + type + " signal...");
-
-            //Lee 100 muestras (nuestro samplingRate)
-            Frame[] frames = device.read(100);
-
-            //Guarda valores en la señal
-            //TODO revisar como pasar datos a enteros desde BITalino
-            for (Frame frame : frames) {
-                int value = frame.analog[channel];
-                signal.getValues().add(value);
-            }
-
-            device.stop();
-            device.close();
-
-            System.out.println("Signal captured successfully!\n");
-            return signal;
-
-        } catch (Exception e) {
-            System.out.println("Error capturing " + type + " signal: " + e.getMessage());
-            e.printStackTrace();
-            return null;
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    //Los tipos de señal están asignados a los canales de la placa de bitalino
-    private int mapSignalTypeToChannel(SignalType type) {
-        switch (type) {
-            case ECG: return 1;
-            case EMG: return 0;
-            case EDA: return 2;
-            case ACC: return 3; // eje X, por ejemplo
-            default: return 444;
-        }
-    }
-
-    //crea un archivo
-    public String createSignalsCSVFile(LocalDate date) throws IOException {
-        String folder = "signals/";
-        Files.createDirectories(Paths.get(folder));
-        String time = java.time.LocalTime.now().toString().replace(":", "-").substring(0, 8);
-        String fileName = "signalFile_" +  date.toString() + "__" + time + ".csv" ;
-        Path path = Paths.get(folder + fileName);
-
-        Files.writeString(path, "\n---------------------------------------------\n");  // archivo vacío
-        return path.toString();
-    }
-
-    //añade una señal al archivo ya creado
-    public void appendSignalToCSV(String filePath, Signal signal) throws IOException {
-        String header = signal.getSignalType().name()+ ": ";
-        String values = signal.getValues().stream().map(String::valueOf).collect(Collectors.joining(","));
-        String line = header + values + "\n";
-
-        Files.write(Paths.get(filePath), line.getBytes(), StandardOpenOption.APPEND);
     }
 
     private void exitMenu(){
