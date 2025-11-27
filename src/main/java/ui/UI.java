@@ -309,10 +309,11 @@ public class UI {
                 manageFiles.appendSignalToCSV(csvFilePath, signal);
                 //signals.add(signal);
                 System.out.println(signalType + " appended to file.\n");
+
             }
         }
 
-        Report report = new Report(patient.getPatientId(), reportDate, patientObservations, null, selectedSymptoms, csvFilePath);
+        Report report = new Report(patient.getPatientId(), reportDate, patientObservations, "", selectedSymptoms, csvFilePath);
         //report.setSignalsFilePath(csvFilePath);
         System.out.println(report);
 

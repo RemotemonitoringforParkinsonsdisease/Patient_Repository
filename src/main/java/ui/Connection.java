@@ -13,7 +13,6 @@ public class Connection {
     private final Socket socket;
     private final DataInputStream in;
     private final DataOutputStream out;
-
     private final SendDataViaNetwork send;
     private final ReceiveDataViaNetwork receive;
 
