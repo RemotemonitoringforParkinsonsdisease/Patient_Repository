@@ -3,9 +3,7 @@ package manageData;
 import POJOS.*;
 
 import java.io.DataInputStream;
-import java.io.EOFException;
 import java.io.IOException;
-import java.net.Socket;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -29,103 +27,74 @@ public class ReceiveDataViaNetwork {
    El primer paso es recibir los reports/el doctor/el paciente por separado para
    mas tarde unirlo en un mismo paciente
     */
-    public Patient recievePatient(){
+    public Patient recievePatient() throws IOException{
         Patient patient = null;
-        try {
-            Integer patientId = dataInputStream.readInt();
-            Integer userId = dataInputStream.readInt();
-            Integer doctorId = dataInputStream.readInt();
-            String patientPassword = dataInputStream.readUTF();
-            String fullName = dataInputStream.readUTF();
-            String date = dataInputStream.readUTF();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate dob = LocalDate.parse(date, formatter);
-            List<Report> reports = receiveReports();
-
-            patient = new Patient(patientId, userId, doctorId, patientPassword, fullName, dob, reports);
-        } catch (EOFException ex) {
-            System.out.println("Todos los datos fueron leídos correctamente.");
-        } catch (IOException ex) {
-            System.err.println("Error al recibir datos del paciente: " + ex.getMessage());
-            ex.printStackTrace();
-        }
+        Integer patientId = dataInputStream.readInt();
+        Integer userId = dataInputStream.readInt();
+        Integer doctorId = dataInputStream.readInt();
+        String patientPassword = dataInputStream.readUTF();
+        String fullName = dataInputStream.readUTF();
+        String date = dataInputStream.readUTF();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate dob = LocalDate.parse(date, formatter);
+        List<Report> reports = receiveReports();
+        patient = new Patient(patientId, userId, doctorId, patientPassword, fullName, dob, reports);
         return patient;
     }
 
-    public User recieveUser(){
+    public User recieveUser() throws IOException{
         User user = null;
-        try {
-            Integer userId = dataInputStream.readInt();
-            String email = dataInputStream.readUTF();
-
-            user = new User(userId,email);
-        } catch (IOException e) {
-            System.err.println("Error al leer el flujo de entrada: " + e.getMessage());
-        }
+        Integer userId = dataInputStream.readInt();
+        String email = dataInputStream.readUTF();
+        user = new User(userId,email);
         return user;
     }
 
     public Report receiveReport() throws IOException{
-        Report report = null;
-
-        try {
-            Integer reportId = dataInputStream.readInt();
-            Integer patientId = dataInputStream.readInt();
-            String date = dataInputStream.readUTF();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate reportDate = LocalDate.parse(date, formatter);
-            List<Signal> signals = receiveSignals();
-            List<Symptoms> symptoms = receiveSymptoms();
-            String patientObservation = dataInputStream.readUTF();
-            String doctorObservation = dataInputStream.readUTF();
-
-            report = new Report(reportId, patientId, reportDate, signals, symptoms, patientObservation, doctorObservation);
-        } catch (IOException e) {
-            System.err.println("Error al leer el flujo de entrada: " + e.getMessage());
-        }
-        return report;
+    Report report = null;
+    Integer reportId = dataInputStream.readInt();
+    Integer patientId = dataInputStream.readInt();
+    String date = dataInputStream.readUTF();
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    LocalDate reportDate = LocalDate.parse(date, formatter);
+    List<Signal> signals = receiveSignals();
+    List<Symptoms> symptoms = receiveSymptoms();
+    String patientObservation = dataInputStream.readUTF();
+    String doctorObservation = dataInputStream.readUTF();
+    report = new Report(reportId, patientId, reportDate, signals, symptoms, patientObservation, doctorObservation);
+    return report;
     }
 
     public List<Report> receiveReports() throws IOException{
-        List<Report> reports = new ArrayList<>();
-        try {
-            int numberOfReports = dataInputStream.readInt();
-            if (numberOfReports == 0) {
-                return reports; //devolvemos lista vacía sin intentar leer nada
-            }
-            for (int i = 0; i < numberOfReports; i++) {
-                reports.add(receiveReport());
-            }
-            return reports;
-        } catch (IOException e){
-            System.err.println("Error al leer el flujo de entrada: " + e.getMessage());
-        }
-        return reports;
+    List<Report> reports = new ArrayList<>();
+    int numberOfReports = dataInputStream.readInt();
+    if (numberOfReports == 0) {
+        return reports; //devolvemos lista vacía sin intentar leer nada
+    }
+    for (int i = 0; i < numberOfReports; i++) {
+        reports.add(receiveReport());
+    }
+    return reports;
     }
 
     public List<Signal> receiveSignals() throws IOException{
-        List<Signal> signals = new ArrayList<>();
-        try {
-            int numSignals = dataInputStream.readInt();
-            if (numSignals == 0) {
-                return signals;
-            }
-
-            for (int i = 0; i < numSignals; i++) {
-                Integer signalId = dataInputStream.readInt();
-                String typeSignal = dataInputStream.readUTF();
-                SignalType signalType = SignalType.valueOf(typeSignal);
-                Integer samplingRate = dataInputStream.readInt();
-                List<Integer> values = receiveListOfIntegerValues();
-                Signal signal = new Signal(signalId, signalType, samplingRate, values);
-                signals.add(signal);
-            }
-            return signals;
-        } catch (IOException e) {
-            System.out.println("Error al leer el flujo de entrada " + e.getMessage());
-        }
+    List<Signal> signals = new ArrayList<>();
+    int numSignals = dataInputStream.readInt();
+    if (numSignals == 0) {
         return signals;
     }
+    for (int i = 0; i < numSignals; i++) {
+        Integer signalId = dataInputStream.readInt();
+        String typeSignal = dataInputStream.readUTF();
+        SignalType signalType = SignalType.valueOf(typeSignal);
+        Integer samplingRate = dataInputStream.readInt();
+        List<Integer> values = receiveListOfIntegerValues();
+        Signal signal = new Signal(signalId, signalType, samplingRate, values);
+        signals.add(signal);
+    }
+    return signals;
+    }
+
 
     public List<Integer> receiveListOfIntegerValues() throws IOException {
         List<Integer> values = new ArrayList<>();
@@ -141,33 +110,15 @@ public class ReceiveDataViaNetwork {
     }
 
     public List<Symptoms> receiveSymptoms() throws IOException{
-        List<Symptoms> symptoms = new ArrayList<>();
-        try {
-            String symptomsLine = dataInputStream.readUTF();
-            if (symptomsLine == null) {
-                return symptoms;
-            }
-            for (String s : symptomsLine.split(",")) {
-                symptoms.add(Symptoms.valueOf(s.trim()));
-            }
+    List<Symptoms> symptoms = new ArrayList<>();
+        String symptomsLine = dataInputStream.readUTF();
+        if (symptomsLine == null) {
             return symptoms;
-        } catch (IOException e) {
-            System.err.println("Error al leer el flujo de entrada: " + e.getMessage());
+        }
+        for (String s : symptomsLine.split(",")) {
+            symptoms.add(Symptoms.valueOf(s.trim()));
         }
         return symptoms;
     }
 
-    /**
-     * Releases the resources used by the `DataInputStream`.
-     */
-    public void releaseResources() {
-        try {
-            if (dataInputStream != null) {
-                dataInputStream.close();
-            }
-        } catch (IOException ex) {
-            System.err.println("Error al liberar los recursos: " + ex.getMessage());
-            ex.printStackTrace();
-        }
-    }
 }

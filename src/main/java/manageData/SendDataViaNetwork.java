@@ -7,10 +7,8 @@ import POJOS.Symptoms;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.Socket;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 public class SendDataViaNetwork {
     private DataOutputStream dataOutputStream;
@@ -100,14 +98,4 @@ public class SendDataViaNetwork {
         }
     }
 
-    public void releaseResources() {
-        try {
-            if (dataOutputStream != null) {
-                dataOutputStream.close();
-            }
-        } catch (IOException ex) {
-            System.err.println("Error releasing resources: " + ex.getMessage());
-            Logger.getLogger(SendDataViaNetwork.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
 }
