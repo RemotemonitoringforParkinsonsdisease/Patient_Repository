@@ -224,9 +224,7 @@ public class UI {
 
         if (reports == null || reports.isEmpty()) {
             System.out.println("You don't have any reports yet!\n");
-            System.out.println("\nPress ENTER to go back to the main menu...");
-            Utilities.readString("");
-            this.loggedInMenu();
+            return;
         }
 
         //ordenamos por fechas, pero en verdad ya estarán ordenadas no??
@@ -388,16 +386,16 @@ public class UI {
         String folder = "signals/";
         Files.createDirectories(Paths.get(folder));
         String time = java.time.LocalTime.now().toString().replace(":", "-").substring(0, 8);
-        String fileName = "signalFile_" +  date.toString() + "__" + time + ".csv\n" + "---------------------------------------------\n";
+        String fileName = "signalFile_" +  date.toString() + "__" + time + ".csv" ;
         Path path = Paths.get(folder + fileName);
 
-        Files.writeString(path, "");  // archivo vacío
+        Files.writeString(path, "\n---------------------------------------------\n");  // archivo vacío
         return path.toString();
     }
 
     //añade una señal al archivo ya creado
     public void appendSignalToCSV(String filePath, Signal signal) throws IOException {
-        String header = signal.getSignalType().name() + ": ";
+        String header = signal.getSignalType().name()+ ": ";
         String values = signal.getValues().stream().map(String::valueOf).collect(Collectors.joining(","));
         String line = header + values + "\n";
 
