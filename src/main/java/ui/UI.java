@@ -172,7 +172,7 @@ public class UI {
             System.out.println("\n1) View my information" +
                     "\n2) See my reports" +
                     "\n3) Create a new report " +
-                    "\n4) Exit"
+                    "\n4) Log out"
             );
             switch (option = Utilities.readInteger("Select an option: ")){
                 case 1:
@@ -188,7 +188,7 @@ public class UI {
                     break;
                 case 4:
                     connection.getSendViaNetwork().sendInt(3);
-                    this.exitMenu();
+                    this.preLoggedMenu();
                     break;
                 default:
                     System.out.println("Please select a valid option.\n");
