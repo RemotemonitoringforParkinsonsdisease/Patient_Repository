@@ -239,10 +239,11 @@ public class UI {
                 }
             }
 
-            int response = Utilities.readInteger("Press 0 to go back to the main menu...");
             do {
+                int response = Utilities.readInteger("Press 0 to go back to the main menu...");
+
                 if (response == 0) {
-                    this.loggedInMenu();
+                    return;
                 } else {
                     System.out.println("Introduce a valid option.\n");
                 }
