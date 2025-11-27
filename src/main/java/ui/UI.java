@@ -297,33 +297,40 @@ public class UI {
     }
 
     public void signalMenu(String csvFilePath) throws IOException {
-        System.out.println("\n-----SIGNAL CAPTURE-----");
-        int index2 = 1;
-        for (SignalType type : SignalType.values()) {
-            System.out.println(index2 + ") " + type);
-            index2++;
-        }
+        boolean continueCapturing = true;
+        while (continueCapturing) {
+            System.out.println("\n-----SIGNAL CAPTURE-----");
+            int index2 = 1;
+            for (SignalType type : SignalType.values()) {
+                System.out.println(index2 + ") " + type);
+                index2++;
+            }
+            System.out.println("0) Finish signal capture");
 
-        while (true) {
             int choice = Utilities.readInteger("Please enter a signal (0 to finish): ");
 
             if (choice == 0) {
+                System.out.println("Signal capture finished.");
                 break;
             }
 
-            if (choice < 0 || choice >= SignalType.values().length) {
-                System.out.println("Please enter a valid signal (0 to finish): ");
+            if (choice < 1 || choice > SignalType.values().length) {
+                System.out.println("Invalid signal. Try again.");
                 continue;
             }
 
-            SignalType signalType = SignalType.values()[choice-1];
+            SignalType signalType = SignalType.values()[choice - 1];
             Signal signal = bitalinoCapture.captureBitalinoSignal(signalType);
 
             if (signal != null) {
-                //Pasamos la señal grabada al archivo CSV creado antes (línea 284)
                 manageFiles.appendSignalToCSV(csvFilePath, signal);
                 System.out.println(signalType + " appended to file.\n");
-                break;
+            }
+
+            // Aquí está LA CLAVE:
+            String answer = Utilities.readString("Do you want to capture another signal? (y/n): ");
+            if (!answer.equalsIgnoreCase("y")) {
+                continueCapturing = false;
             }
         }
     }
