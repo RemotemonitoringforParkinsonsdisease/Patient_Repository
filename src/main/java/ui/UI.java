@@ -10,7 +10,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -280,8 +279,9 @@ public class UI {
 
             System.out.println(chosenSymptom + ", added.");
         }
-        // ------------------ CREAR ARCHIVO CSV DEL REPORT ------------------
-        String csvFilePath = createReportCSVFile(reportDate);
+
+        //creamos el archivo de señales
+        String csvFilePath = createSignalsCSVFile(reportDate);
         System.out.println("CSV file created at: " + csvFilePath);
 
         System.out.println("\n-----SIGNAL CAPTURE-----");
@@ -309,6 +309,7 @@ public class UI {
             Signal signal = captureBitalinoSignal(signalType);
 
             if (signal != null) {
+                //Pasamos la señal grabada al archivo CSV creado antes (línea 284)
                 appendSignalToCSV(csvFilePath, signal);
                 signals.add(signal);
                 System.out.println(signalType + " appended to file.\n");
@@ -382,16 +383,12 @@ public class UI {
         }
     }
 
-
-    // -------------------------------------------------------------------------------------
-    //                           ARCHIVOS CSV DE SEÑALES
-    // -------------------------------------------------------------------------------------
-
     //crea un archivo
-    public String createReportCSVFile(LocalDate date) throws IOException {
+    public String createSignalsCSVFile(LocalDate date) throws IOException {
         String folder = "signals/";
         Files.createDirectories(Paths.get(folder));
-        String fileName = "report_" +  date.toString() + ".csv";
+        String time = java.time.LocalTime.now().toString().replace(":", "-").substring(0, 8);
+        String fileName = "signalFile_" +  date.toString() + "__" + time + ".csv\n" + "---------------------------------------------\n";
         Path path = Paths.get(folder + fileName);
 
         Files.writeString(path, "");  // archivo vacío
@@ -400,19 +397,12 @@ public class UI {
 
     //añade una señal al archivo ya creado
     public void appendSignalToCSV(String filePath, Signal signal) throws IOException {
-
         String header = signal.getSignalType().name() + ": ";
-
-        String values = signal.getValues()
-                .stream()
-                .map(String::valueOf)
-                .collect(Collectors.joining(","));
-
+        String values = signal.getValues().stream().map(String::valueOf).collect(Collectors.joining(","));
         String line = header + values + "\n";
 
         Files.write(Paths.get(filePath), line.getBytes(), StandardOpenOption.APPEND);
     }
-
 
     private void exitMenu(){
         System.out.println("\nClosing the application...");
