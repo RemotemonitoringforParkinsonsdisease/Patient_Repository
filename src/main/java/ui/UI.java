@@ -281,7 +281,7 @@ public class UI {
         System.out.println("CSV file created at: " + csvFilePath);
 
         System.out.println("\n-----SIGNAL CAPTURE-----");
-        List<Signal> signals = new ArrayList<>();
+        //List<Signal> signals = new ArrayList<>();
 
         int index2 = 1;
         for (SignalType type : SignalType.values()) {
@@ -307,13 +307,13 @@ public class UI {
             if (signal != null) {
                 //Pasamos la señal grabada al archivo CSV creado antes (línea 284)
                 manageFiles.appendSignalToCSV(csvFilePath, signal);
-                signals.add(signal);
+                //signals.add(signal);
                 System.out.println(signalType + " appended to file.\n");
             }
         }
 
-        Report report = new Report(patient.getPatientId(), reportDate, patientObservations, null, selectedSymptoms, signals);
-        report.setCsvFilePath(csvFilePath);
+        Report report = new Report(patient.getPatientId(), reportDate, patientObservations, null, selectedSymptoms, csvFilePath);
+        //report.setSignalsFilePath(csvFilePath);
         System.out.println(report);
 
         connection.getSendViaNetwork().sendReport(report);

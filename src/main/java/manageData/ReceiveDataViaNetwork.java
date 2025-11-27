@@ -3,7 +3,11 @@ package manageData;
 import POJOS.*;
 
 import java.io.DataInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -57,11 +61,11 @@ public class ReceiveDataViaNetwork {
     String date = dataInputStream.readUTF();
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     LocalDate reportDate = LocalDate.parse(date, formatter);
-    List<Signal> signals = receiveSignals();
+    String signalsFilePath = receiveCSVFile();
     List<Symptoms> symptoms = receiveSymptoms();
     String patientObservation = dataInputStream.readUTF();
     String doctorObservation = dataInputStream.readUTF();
-    report = new Report(reportId, patientId, reportDate, signals, symptoms, patientObservation, doctorObservation);
+    report = new Report(reportId, patientId, reportDate, signalsFilePath, symptoms, patientObservation, doctorObservation);
     return report;
     }
 
@@ -77,36 +81,28 @@ public class ReceiveDataViaNetwork {
     return reports;
     }
 
-    public List<Signal> receiveSignals() throws IOException{
-    List<Signal> signals = new ArrayList<>();
-    int numSignals = dataInputStream.readInt();
-    if (numSignals == 0) {
-        return signals;
-    }
-    for (int i = 0; i < numSignals; i++) {
-        Integer signalId = dataInputStream.readInt();
-        String typeSignal = dataInputStream.readUTF();
-        SignalType signalType = SignalType.valueOf(typeSignal);
-        Integer samplingRate = dataInputStream.readInt();
-        List<Integer> values = receiveListOfIntegerValues();
-        Signal signal = new Signal(signalId, signalType, samplingRate, values);
-        signals.add(signal);
-    }
-    return signals;
-    }
+    public String receiveCSVFile() throws IOException {
 
+        String fileName = dataInputStream.readUTF();
+        long fileSize = dataInputStream.readLong();
 
-    public List<Integer> receiveListOfIntegerValues() throws IOException {
-        List<Integer> values = new ArrayList<>();
-        int numValues = dataInputStream.readInt();
-        if (numValues == 0) {
-            return values;
+        String folder = "server_files/";
+        Files.createDirectories(Paths.get(folder));
+
+        Path filePath = Paths.get(folder + fileName);
+        FileOutputStream fos = new FileOutputStream(filePath.toFile());
+
+        byte[] buffer = new byte[4096];
+        long remaining = fileSize;
+        int bytesRead;
+
+        while (remaining > 0 && (bytesRead = dataInputStream.read(buffer, 0, (int)Math.min(buffer.length, remaining))) != -1) {
+            fos.write(buffer, 0, bytesRead);
+            remaining -= bytesRead;
         }
-        for (int i = 0; i < numValues; i++) {
-            Integer value = dataInputStream.readInt();
-            values.add(value);
-        }
-        return values;
+
+        fos.close();
+        return filePath.toString(); // ruta en el servidor
     }
 
     public List<Symptoms> receiveSymptoms() throws IOException{
@@ -120,5 +116,4 @@ public class ReceiveDataViaNetwork {
         }
         return symptoms;
     }
-
 }
