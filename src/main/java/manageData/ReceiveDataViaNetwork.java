@@ -82,11 +82,10 @@ public class ReceiveDataViaNetwork {
     }
 
     public String receiveCSVFile() throws IOException {
-
         String fileName = dataInputStream.readUTF();
         long fileSize = dataInputStream.readLong();
 
-        String folder = "server_files/";
+        String folder = "signals_recived/";
         Files.createDirectories(Paths.get(folder));
 
         Path filePath = Paths.get(folder + fileName);
