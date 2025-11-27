@@ -233,10 +233,12 @@ public class UI {
                 System.out.println("Patient Observation: " + report.getPatientObservation());
                 System.out.println("Doctor Observation: " + report.getDoctorObservation());
                 System.out.println("Symptoms:");
-
-                for (Symptoms s : report.getSymptoms()) {
+                System.out.println(report.getSymptoms());
+                /*for (Symptoms s : report.getSymptoms()) {
                     System.out.println(s);
                 }
+
+                 */
             }
 
             do {
@@ -288,7 +290,7 @@ public class UI {
         signalMenu(csvFilePath);
 
         Report report = new Report(patient.getPatientId(), reportDate, patientObservations, "", selectedSymptoms, csvFilePath);
-        //report.setSignalsFilePath(csvFilePath);
+        patient.getReports().add(report);
         System.out.println(report);
 
         connection.getSendViaNetwork().sendReport(report);
