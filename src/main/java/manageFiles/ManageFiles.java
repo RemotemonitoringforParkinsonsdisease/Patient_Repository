@@ -16,13 +16,13 @@ public class ManageFiles {
 
     //crea un archivo
     public String createSignalsCSVFile(LocalDate date) throws IOException {
-        String folder = "signals/";
+        String folder = "signals_captured/";
         Files.createDirectories(Paths.get(folder));
         String time = java.time.LocalTime.now().toString().replace(":", "-").substring(0, 8);
         String fileName = "signalFile_" +  date.toString() + "__" + time + ".csv" ;
         Path path = Paths.get(folder + fileName);
 
-        Files.writeString(path, fileName + "\n------------------------------------\n");  // archivo vacío
+        Files.writeString(path, fileName + "\n-------------------------------------------\n");  // archivo vacío
         return path.toString();
     }
 

@@ -80,6 +80,7 @@ public class Utilities {
         }
     }
 
+    /*
     public static String formatMacAdress(String input) {
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < input.length(); i++) {
@@ -90,5 +91,5 @@ public class Utilities {
         }
         return result.toString();
     }
-
+     */
 }
