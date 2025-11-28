@@ -242,7 +242,6 @@ public class UI {
 
     private void seePatientInfo(Patient patient) throws IOException {
         User patientUser = connection.getReceiveViaNetwork().recieveUser();
-        System.out.println(patient);
         System.out.println("""
         ╔════════════════════════════════════════╗
         ║            YOUR INFORMATION            ║
