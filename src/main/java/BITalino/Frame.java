@@ -2,8 +2,6 @@ package BITalino;
 
 /// A frame returned by BITalino.read()
 public class Frame {
-    /// CRC4 check function result for the frame
-    public int CRC;
 
     /// %Frame sequence number (0...15).
     /// This number is incremented by 1 on each consecutive frame, and it overflows to 0 after 15 (it is a 4-bit number).

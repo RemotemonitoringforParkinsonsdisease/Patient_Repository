@@ -67,37 +67,7 @@ public class BITalino {
 
     public BITalino() {}
 
-    public Vector<RemoteDevice> findDevices() throws InterruptedException
-    {
-        /** Searches for Bluetooth devices in range.
-         * \return a list of found devices with the name BITalino
-         */
-        DeviceDiscoverer finder = new  DeviceDiscoverer();
-        while (finder.inqStatus == null)
-        {
-            Thread.sleep(1000);
-        }
-        finder.inqStatus = null;
-        return finder.remoteDevices;
-
-    }
-
-    public void open(String macAdd) throws Throwable
-    {
-        /** Connects to a %BITalino device.
-         * \param[in] macAdd The device Bluetooth MAC address ("xx:xx:xx:xx:xx:xx")
-
-         * \exception BITalinoErrorTypes (BITalinoErrorTypes.MACADDRESS_NOT_VALID)
-         * \exception BITalinoErrorTypes (BITalinoErrorTypes.SAMPLING_RATE_NOT_DEFINED)
-         * \exception IllegalArgumentException
-         * \exception ConnectionNotFoundException
-         * \exception IOException
-         * \exception SecurityException
-         */
-        open(macAdd, 1000);
-    }
-
-    public void open(String macAdd, int samplingRate) throws BITalinoException
+       public void open(String macAdd, int samplingRate) throws BITalinoException
     {
         /** Connects to a %BITalino device.
          * \param[in] macAdd The device Bluetooth MAC address ("xx:xx:xx:xx:xx:xx")
@@ -263,96 +233,6 @@ public class BITalino {
         }
     }
 
-    public void battery(int value) throws BITalinoException
-    {
-        /** Sets the battery voltage threshold for the low-battery LED.
-         * \param[in] value Battery voltage threshold. Default value is 0.
-         * Value | Voltage Threshold
-         * ----- | -----------------
-         *     0 |   3.4 V
-         *  ...  |   ...
-         *    63 |   3.8 V
-         * \remarks This method cannot be called during an acquisition.
-         * \exception BITalinoException (BITalinoErrorTypes.THRESHOLD_NOT_VALID)
-         * \exception BITalinoException (BITalinoErrorTypes.LOST_COMMUNICATION)
-         */
-        int Mode;
-        if (value >= 0 && value<=63)
-        {
-            Mode = value << 2;
-            Write(Mode);
-
-        }
-        else
-        {
-            throw new BITalinoException(BITalinoErrorTypes.THRESHOLD_NOT_VALID);
-        }
-
-    }
-
-    public void trigger(int[] digitalArray) throws BITalinoException
-    {
-        /** Assigns the digital outputs states.
-         * \param[in] digitalArray Vector of integers to assign to digital outputs, starting at first output (O1).
-         * On each vector element, 0 sets the output to low level and 1 sets the output to high level.
-         * This vector must contain exactly 4 elements.
-         * \remarks This method must be called only during an acquisition on original %BITalino. On %BITalino 2 there is no restriction.
-         * \exception BITalinoException (BITalinoErrorTypes.DIGITAL_CHANNELS_NOT_VALID)
-         * \exception BITalinoException (BITalinoErrorTypes.LOST_COMMUNICATION)
-         */
-        if (digitalArray.length != 4)
-        {
-            throw new BITalinoException(BITalinoErrorTypes.DIGITAL_CHANNELS_NOT_VALID);
-        }
-        else
-        {
-            int data  = 3;
-            for (int i= 0;i<digitalArray.length;i++)
-            {
-                if (digitalArray[i]<0 | digitalArray[i]>1)
-                {
-                    throw new BITalinoException(BITalinoErrorTypes.DIGITAL_CHANNELS_NOT_VALID);
-                }
-                else
-                {
-                    data = data | digitalArray[i]<<(2+i);
-                }
-
-            }
-            Write(data);
-        }
-    }
-
-    public String version() throws BITalinoException, IOException
-    {
-        /** Returns the device firmware version string.
-         * \remarks This method cannot be called during an acquisition.
-         * \exception BITalinoException (BITalinoErrorTypes.LOST_COMMUNICATION)
-         * \exception IOException
-         */
-        try
-        {
-            Write(7);
-            byte[] version = new byte[30];
-            String test = "";
-            int i = 0;
-            while (true)
-            {
-                iStream.read(version,i,1);
-                i++;
-                test = new String(new byte[] {version[i-1]});
-                if (test.equals("\n"))
-                {
-                    break;
-                }
-            }
-            return new String(version);
-        }
-        catch(Exception e)
-        {
-            throw new BITalinoException(BITalinoErrorTypes.LOST_COMMUNICATION);
-        }
-    }
 
     private Frame[] decode(byte[] buffer) throws IOException, BITalinoException
     {
