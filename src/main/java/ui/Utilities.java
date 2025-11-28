@@ -1,7 +1,5 @@
 package ui;
 
-import POJOS.Patient;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -9,7 +7,6 @@ import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 
 public class Utilities {
 

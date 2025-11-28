@@ -65,14 +65,13 @@ public class BITalino {
     /// Instance of the data stream through which data can be sent to the BITalino device
     private DataOutputStream oStream = null;
 
-    public BITalino() {}
+    public BITalino() {
+    }
 
-       public void open(String macAdd, int samplingRate) throws BITalinoException
-    {
+    public void open(String macAdd, int samplingRate) throws BITalinoException {
         /** Connects to a %BITalino device.
          * \param[in] macAdd The device Bluetooth MAC address ("xx:xx:xx:xx:xx:xx")
          * \param[in] samplingRate Sampling rate in Hz. Accepted values are 1, 10, 100 or 1000 Hz. Default value is 1000 Hz.
-
          * \exception BITalinoErrorTypes (BITalinoErrorTypes.MACADDRESS_NOT_VALID)
          * \exception BITalinoErrorTypes (BITalinoErrorTypes.SAMPLING_RATE_NOT_DEFINED)
          * \exception IllegalArgumentException
@@ -80,35 +79,28 @@ public class BITalino {
          * \exception IOException
          * \exception SecurityException
          */
-        if (macAdd.split(":").length > 1)
-        {
+        if (macAdd.split(":").length > 1) {
             macAdd = macAdd.replace(":", "");
         }
-        if (macAdd.length() != 12)
-        {
+        if (macAdd.length() != 12) {
             throw new BITalinoException(BITalinoErrorTypes.MACADDRESS_NOT_VALID);
         }
 
-        try
-        {
-            hSocket = (StreamConnection)Connector.open("btspp://" + macAdd + ":1", Connector.READ_WRITE);
+        try {
+            hSocket = (StreamConnection) Connector.open("btspp://" + macAdd + ":1", Connector.READ_WRITE);
             iStream = hSocket.openDataInputStream();
             oStream = hSocket.openDataOutputStream();
             Thread.sleep(2000);
 
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             close();
         }
 
-        try
-        {
+        try {
             int variableToSend = 0;
             // Configure sampling rate
 
-            switch(samplingRate)
-            {
+            switch (samplingRate) {
                 case 1000:
                     variableToSend = 0x3;
                     break;
@@ -124,17 +116,14 @@ public class BITalino {
                 default:
                     close();
             }
-            variableToSend = (variableToSend<<6)|0x03;
+            variableToSend = (variableToSend << 6) | 0x03;
             Write(variableToSend);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new BITalinoException(BITalinoErrorTypes.SAMPLING_RATE_NOT_DEFINED);
         }
     }
 
-    public void start(int[] anChannels) throws Throwable
-    {
+    public void start(int[] anChannels) throws Throwable {
         /** Starts a signal acquisition from the device.
          * \param[in] anChannels Set of channels to acquire. Accepted channels are 0...5 for inputs A1...A6.
          * If this set is empty, no analog channels will be acquired.
@@ -148,174 +137,144 @@ public class BITalino {
         } else {
             int bit = 1;
             for (int i : anChannels) {
-                if (i<0 | i>5)
-                {
+                if (i < 0 | i > 5) {
                     throw new BITalinoException(BITalinoErrorTypes.ANALOG_CHANNELS_NOT_VALID);
-                }
-                else
-                {
-                    bit = bit | 1<<(2+i);
+                } else {
+                    bit = bit | 1 << (2 + i);
                 }
             }
             int nChannels = analogChannels.length;
             if (nChannels <= 4) {
-                number_bytes = (int) Math.ceil(((float)12 + (float)10 *nChannels)/8);
+                number_bytes = (int) Math.ceil(((float) 12 + (float) 10 * nChannels) / 8);
 
 
             } else {
-                number_bytes = (int) Math.ceil(((float)52 + (float)6*(nChannels-4))/8);
+                number_bytes = (int) Math.ceil(((float) 52 + (float) 6 * (nChannels - 4)) / 8);
             }
-            try
-            {
+            try {
                 Write(bit);
-            }
-            catch(Exception e)
-            {
+            } catch (Exception e) {
                 throw new BITalinoException(BITalinoErrorTypes.BT_DEVICE_NOT_CONNECTED);
             }
         }
 
     }
 
-    public void stop() throws BITalinoException
-    {
+    public void stop() throws BITalinoException {
         /** Stops a signal acquisition.
          * \remarks This method must be called only during an acquisition.
          * \exception BITalinoException (BITalinoErrorTypes.BT_DEVICE_NOT_CONNECTED)
          */
-        try
-        {
+        try {
             Write(0);
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             throw new BITalinoException(BITalinoErrorTypes.BT_DEVICE_NOT_CONNECTED);
         }
     }
 
-    public void close() throws BITalinoException
-    {
+    public void close() throws BITalinoException {
         /** Disconnects from a %BITalino device. If an aquisition is running, it is stopped.
          * \exception BITalinoException (BITalinoErrorTypes.BT_DEVICE_NOT_CONNECTED)
          */
-        try
-        {
+        try {
             hSocket.close();
             iStream.close();
             oStream.close();
-            hSocket=null;
+            hSocket = null;
             iStream = null;
             oStream = null;
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             throw new BITalinoException(BITalinoErrorTypes.BT_DEVICE_NOT_CONNECTED);
         }
 
     }
 
-    public void Write(int data) throws BITalinoException
-    {
+    public void Write(int data) throws BITalinoException {
         /**
          * Send a command to BITalino
          * \param[in] data Byte corresponding to the command to be sent to the %BITalino device
          * \exception BITalinoException (BITalinoErrorTypes.LOST_COMMUNICATION)
          */
-        try
-        {
+        try {
             oStream.write(data);
             oStream.flush();
             Thread.sleep(1000);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new BITalinoException(BITalinoErrorTypes.LOST_COMMUNICATION);
         }
     }
 
 
-    private Frame[] decode(byte[] buffer) throws IOException, BITalinoException
-    {
+    private Frame[] decode(byte[] buffer) throws IOException, BITalinoException {
         /** Unpack a raw byte stream into a frames vector.
          * \param[in] buffer Vector with the bytes read from the device.
          * \return Vector of frames decoded frames.
          * \exception BITalinoException (BITalinoErrorTypes.INCORRECT_DECODE)
          */
-        try
-        {
+        try {
             Frame[] frames = new Frame[1];
-            int j=(number_bytes-1), i=0, CRC = 0,x0=0,x1=0,x2=0,x3=0,out=0,inp=0;
-            CRC= (buffer[j-0]&0x0F)&0xFF;
+            int j = (number_bytes - 1), i = 0, CRC = 0, x0 = 0, x1 = 0, x2 = 0, x3 = 0, out = 0, inp = 0;
+            CRC = (buffer[j - 0] & 0x0F) & 0xFF;
             // check CRC
-            for (int bytes = 0; bytes<number_bytes;bytes++)
-            {
-                for (int bit=7;bit>-1;bit--)
-                {
-                    inp=(buffer[bytes])>>bit & 0x01;
-                    if (bytes == (number_bytes - 1) && bit<4)
-                    {
+            for (int bytes = 0; bytes < number_bytes; bytes++) {
+                for (int bit = 7; bit > -1; bit--) {
+                    inp = (buffer[bytes]) >> bit & 0x01;
+                    if (bytes == (number_bytes - 1) && bit < 4) {
                         inp = 0;
                     }
-                    out=x3;
-                    x3=x2;
-                    x2=x1;
-                    x1=out^x0;
-                    x0=inp^out;
+                    out = x3;
+                    x3 = x2;
+                    x2 = x1;
+                    x1 = out ^ x0;
+                    x0 = inp ^ out;
                 }
             }
             //if the message was correctly received, it starts decoding
-            if (CRC == ((x3<<3)|(x2<<2)|(x1<<1)|x0))
-            {
+            if (CRC == ((x3 << 3) | (x2 << 2) | (x1 << 1) | x0)) {
 
                 /*parse frames*/
 
-                frames[i]=new Frame();
-                frames[i].seq = (short) ((buffer[j-0]&0xF0)>>4)&0xf;
-                frames[i].digital[0] = (short)((buffer[j-1]>>7)&0x01);
-                frames[i].digital[1] = (short)((buffer[j-1]>>6)&0x01);
-                frames[i].digital[2] = (short)((buffer[j-1]>>5)&0x01);
-                frames[i].digital[3] = (short)((buffer[j-1]>>4)&0x01);
+                frames[i] = new Frame();
+                frames[i].seq = (short) ((buffer[j - 0] & 0xF0) >> 4) & 0xf;
+                frames[i].digital[0] = (short) ((buffer[j - 1] >> 7) & 0x01);
+                frames[i].digital[1] = (short) ((buffer[j - 1] >> 6) & 0x01);
+                frames[i].digital[2] = (short) ((buffer[j - 1] >> 5) & 0x01);
+                frames[i].digital[3] = (short) ((buffer[j - 1] >> 4) & 0x01);
 
                 /*parse buffer frame*/
-                switch(analogChannels.length-1)
-                {
+                switch (analogChannels.length - 1) {
 
                     case 5:
-                        frames[i].analog[5]= (short)((buffer[j-7]&0x3F));
+                        frames[i].analog[5] = (short) ((buffer[j - 7] & 0x3F));
                     case 4:
 
-                        frames[i].analog[4] = (short)((((buffer[j-6]&0x0F)<<2)|((buffer[j-7]&0xc0)>>6))&0x3f);
+                        frames[i].analog[4] = (short) ((((buffer[j - 6] & 0x0F) << 2) | ((buffer[j - 7] & 0xc0) >> 6)) & 0x3f);
                     case 3:
 
-                        frames[i].analog[3] = (short)((((buffer[j-5]&0x3F)<<4)|((buffer[j-6]&0xf0)>>4))&0x3ff);
+                        frames[i].analog[3] = (short) ((((buffer[j - 5] & 0x3F) << 4) | ((buffer[j - 6] & 0xf0) >> 4)) & 0x3ff);
                     case 2:
 
-                        frames[i].analog[2] = (short)((((buffer[j-4]&0xff)<<2)|(((buffer[j-5]&0xc0)>>6)))&0x3ff);
+                        frames[i].analog[2] = (short) ((((buffer[j - 4] & 0xff) << 2) | (((buffer[j - 5] & 0xc0) >> 6))) & 0x3ff);
                     case 1:
 
-                        frames[i].analog[1] = (short)((((buffer[j-2]&0x3)<<8)|(buffer[j-3])&0xff)&0x3ff);
+                        frames[i].analog[1] = (short) ((((buffer[j - 2] & 0x3) << 8) | (buffer[j - 3]) & 0xff) & 0x3ff);
                     case 0:
 
-                        frames[i].analog[0] = (short)((((buffer[j-1]&0xF)<<6)|((buffer[j-2]&0XFC)>>2))&0x3ff);
+                        frames[i].analog[0] = (short) ((((buffer[j - 1] & 0xF) << 6) | ((buffer[j - 2] & 0XFC) >> 2)) & 0x3ff);
                 }
 
 
-            }
-            else
-            {
-                frames[i]=new Frame();
+            } else {
+                frames[i] = new Frame();
                 frames[i].seq = -1;
             }
             return frames;
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new BITalinoException(BITalinoErrorTypes.INCORRECT_DECODE);
         }
     }
 
-    public Frame[] read(int nSamples) throws BITalinoException
-    {
+    public Frame[] read(int nSamples) throws BITalinoException {
         /** Reads acquisition frames from the device.
          * This method returns when all requested frames are received from the device, or when a receive timeout occurs.
          * \param[in] nSamples Number of frames that should be read from the device.
@@ -323,45 +282,33 @@ public class BITalino {
          * \remarks If a problem occurred, the size of the frames vector  is lower than the frames vector size. This method must be called only during an acquisition.
          * \exception BITalinoException (BITalinoErrorTypes.LOST_COMMUNICATION)
          */
-        try
-        {
+        try {
             Frame[] frames = new Frame[nSamples];
             byte[] buffer = new byte[number_bytes];
             byte[] bTemp = new byte[1];
-            int i=0;
-            while (i<nSamples)
-            {
-                iStream.readFully(buffer,0,number_bytes);
+            int i = 0;
+            while (i < nSamples) {
+                iStream.readFully(buffer, 0, number_bytes);
                 Frame[] f = decode(buffer);
-                if (f[0].seq == -1)
-                {
-                    while (f[0].seq == -1)
-                    {
-                        iStream.readFully(bTemp,0,1);
-                        for (int j = number_bytes-2; j >= 0; j--)
-                        {
-                            buffer[j+1] = buffer[j];
+                if (f[0].seq == -1) {
+                    while (f[0].seq == -1) {
+                        iStream.readFully(bTemp, 0, 1);
+                        for (int j = number_bytes - 2; j >= 0; j--) {
+                            buffer[j + 1] = buffer[j];
                         }
                         buffer[0] = bTemp[0];
                         f = decode(buffer);
                     }
                     frames[i] = f[0];
-                }
-                else
-                {
+                } else {
 
                     frames[i] = f[0];
                 }
                 i++;
             }
             return frames;
+        } catch (Exception e) {
+            throw new BITalinoException(BITalinoErrorTypes.LOST_COMMUNICATION);
         }
-        catch (Exception e)
-        {
-            throw new BITalinoException (BITalinoErrorTypes.LOST_COMMUNICATION);
-        }
-
     }
-
-
 }

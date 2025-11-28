@@ -1,15 +1,8 @@
 package POJOS;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class Signal {
     private Integer signalId;
@@ -22,13 +15,6 @@ public class Signal {
         this.values = new ArrayList<>();
     }
 
-    public Signal(Integer signalId, SignalType signalType, Integer samplingRate, List<Integer> values) {
-        this.signalId = signalId;
-        this.signalType = signalType;
-        this.samplingRate = samplingRate;
-        this.values = values;
-    }
-
     public SignalType getSignalType() {
         return signalType;
     }
@@ -36,7 +22,6 @@ public class Signal {
     public List<Integer> getValues() {
         return values;
     }
-
 
     @Override
     public boolean equals(Object o) {

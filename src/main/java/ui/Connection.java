@@ -2,7 +2,6 @@ package ui;
 
 import manageData.ReceiveDataViaNetwork;
 import manageData.SendDataViaNetwork;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
