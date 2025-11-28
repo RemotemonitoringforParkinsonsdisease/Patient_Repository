@@ -13,12 +13,9 @@ public class BItalinoCapture {
         String mac = "BC:33:AC:AB:AE:E5";  //Cambiar por el nuestro
         //String mac = "98:D3:91:FD:69:4F";  //Cambiar por el nuestro
 
-
-        //Canal traducido del tipo de señal que le pasamos
+        //Canal del BItalino real
         int channel = mapSignalTypeToChannel(type);
-
         Signal signal = new Signal(type);
-
         try {
 
             BITalino device = new BITalino();
@@ -37,7 +34,7 @@ public class BItalinoCapture {
             //Guarda valores en la señal
             //TODO revisar como pasar datos a enteros desde BITalino
             for (Frame frame : frames) {
-                int value = frame.analog[channel];
+                int value = frame.analog[0];
                 signal.getValues().add(value);
             }
 
@@ -59,11 +56,11 @@ public class BItalinoCapture {
     //Los tipos de señal están asignados a los canales de la placa de bitalino
     private int mapSignalTypeToChannel(SignalType type) {
         switch (type) {
-            case ECG: return 1;
             case EMG: return 0;
+            case ECG: return 1;
             case EDA: return 2;
-            case ACC: return 3; // eje X, por ejemplo
-            default: return 444;
+            case ACC: return 3; //eje X, por ejemplo
+            default: return 444; //Gestionar esto
         }
     }
 }
