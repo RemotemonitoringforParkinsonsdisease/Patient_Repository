@@ -201,7 +201,6 @@ public class UI {
 
     private void loggedMenu() throws IOException {
         Patient patient = connection.getReceiveViaNetwork().recievePatient();
-        int option = 0;
         do{
             System.out.println("""
             ╔════════════════════════════════════════╗
@@ -216,7 +215,8 @@ public class UI {
             System.out.println("-> Welcome " + patient.getFullName() + "!");
             System.out.println("----------------------------------------------");
 
-            switch (option = Utilities.readInteger("-> Select an option: ")){
+            int option = Utilities.readInteger("-> Select an option: ");
+            switch (option){
                 case 1:
                     connection.getSendViaNetwork().sendInt(1);
                     this.seePatientInfo(patient);
