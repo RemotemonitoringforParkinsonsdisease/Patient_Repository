@@ -242,6 +242,7 @@ public class UI {
 
     private void seePatientInfo(Patient patient) throws IOException {
         User patientUser = connection.getReceiveViaNetwork().recieveUser();
+        System.out.println(patient);
         System.out.println("""
         ╔════════════════════════════════════════╗
         ║            YOUR INFORMATION            ║
@@ -286,7 +287,6 @@ public class UI {
             System.out.println("----------------------------------------------");
             return;
         } else {
-            //ordenamos por fechas, pero en verdad ya estarán ordenadas no??
             reports.sort((r1, r2) -> r2.getReportDate().compareTo(r1.getReportDate()));
 
             for (int i = 0; i < reports.size(); i++) {
