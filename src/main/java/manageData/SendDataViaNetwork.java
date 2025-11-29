@@ -10,35 +10,53 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 
-
+/**
+ * Class responsible for sending structured data over a network connection
+ * using a {@link DataOutputStream}. It serializes objects such as {@link Patient},
+ * {@link Report}, and lists of {@link Symptoms} following the expected protocol
+ * of the receiving server.
+ */
 public class SendDataViaNetwork {
     private DataOutputStream dataOutputStream;
 
+    /**
+     * Constructor of the class.
+     *
+     * @param dos the output stream used to send serialized data to the server
+     */
     public SendDataViaNetwork(DataOutputStream dos) {
         this.dataOutputStream = dos;
     }
 
+    /**
+     * Sends a UTF-encoded string over the network.
+     *
+     * @param message the string to send
+     * @throws IOException if an I/O error occurs while writing to the stream
+     */
     public void sendStrings(String message) throws IOException {
         dataOutputStream.writeUTF(message);
         dataOutputStream.flush();
     }
 
+    /**
+     * Sends an integer value over the network.
+     *
+     * @param message the integer to send
+     * @throws IOException if an I/O error occurs while writing to the stream
+     */
     public void sendInt(int message) throws IOException{
         dataOutputStream.writeInt(message);
         dataOutputStream.flush();
     }
 
-    public void sendPatient(Patient patient) throws IOException{
-        dataOutputStream.writeInt(patient.getPatientId());
-        dataOutputStream.writeInt(patient.getUserId());
-        dataOutputStream.writeInt(patient.getDoctorId());
-        dataOutputStream.writeUTF(patient.getPatientPassword());
-        dataOutputStream.writeUTF(patient.getFullName());
-        dataOutputStream.writeUTF(patient.getDob().toString());
-        sendReports(patient.getReports());
-        dataOutputStream.flush();
-    }
-
+    /**
+     * Sends the registration fields of a {@link Patient}, including:
+     * (password, fullName, date of birth).
+     *
+     * @param patient the patient whose information will be sent
+     * @throws IOException if an error occurs during transmission
+     */
     public void sendRegisteredPatient(Patient patient) throws IOException{
         dataOutputStream.writeUTF(patient.getPatientPassword());
         dataOutputStream.writeUTF(patient.getFullName());
@@ -46,18 +64,14 @@ public class SendDataViaNetwork {
         dataOutputStream.flush();
     }
 
-    public void sendReports(List<Report> reports) throws IOException{
-        for (Report r : reports) {
-            dataOutputStream.writeInt(r.getPatientId());
-            dataOutputStream.writeUTF(r.getReportDate().toString());
-            sendSymptoms(r.getSymptoms());
-            sendCSVFile(r.getSignalsFilePath());
-            dataOutputStream.writeUTF(r.getPatientObservation());
-            dataOutputStream.writeUTF(r.getDoctorObservation());
-            dataOutputStream.flush();
-        }
-    }
-
+    /**
+     * Sends the fields of a {@link Report} in the following order:
+     * (patientId, reportDate, symptoms, patientObservation,
+     * doctorObservation, CSV file path).
+     *
+     * @param r the report to send
+     * @throws IOException if an I/O error occurs during transmission
+     */
     public void sendReport(Report r) throws IOException{
         dataOutputStream.writeInt(r.getPatientId());
         dataOutputStream.writeUTF(r.getReportDate().toString());
@@ -68,17 +82,19 @@ public class SendDataViaNetwork {
         dataOutputStream.flush();
     }
 
+    /**
+     * Sends a CSV file through the network. The transmission includes: fileName, fileSize in bytes and the file content
+     *
+     * @param filePath the path to the CSV file to send
+     * @throws IOException if an I/O error occurs while reading or sending the file
+     */
     public void sendCSVFile (String filePath) throws IOException {
         File file = new File(filePath);
         FileInputStream fis = new FileInputStream(file);
 
-        // 1. Enviar el nombre del archivo
         dataOutputStream.writeUTF(file.getName());
-
-        // 2. Enviar tamaño del archivo
         dataOutputStream.writeLong(file.length());
 
-        // 3. Enviar contenido
         byte[] buffer = new byte[4096];
         int bytesRead;
 
@@ -90,13 +106,20 @@ public class SendDataViaNetwork {
         fis.close();
     }
 
+    /**
+     * Sends a list of {@link Symptoms} as a comma-separated UTF string.
+     * Example: {@code "TREMOR,ANXIETY,SOFT_VOICE"}.
+     *
+     * @param symptoms the list of symptoms to send
+     * @throws IOException if an I/O error occurs during transmission
+     */
     public void sendSymptoms(List<Symptoms> symptoms) throws IOException{
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < symptoms.size(); i++) {
             sb.append(symptoms.get(i).name());
             if (i < symptoms.size() - 1) {
-                sb.append(",");  // Añadir coma excepto en el último
+                sb.append(",");
             }
         }
         dataOutputStream.writeUTF(sb.toString());

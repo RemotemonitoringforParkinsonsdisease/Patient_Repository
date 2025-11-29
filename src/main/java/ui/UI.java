@@ -9,16 +9,45 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Main User Interface class for the Patient Application.
+ *
+ * This class manages all interactions with the patient user through a console-based menu system.
+ * It handles connection establishment, login, registration, report creation, signal acquisition from BITalino,
+ * and communication with the server through a {@link Connection} object.
+ *
+ * The UI is stateful and remains active until the user explicitly exits.
+ */
 public class UI {
+
+    /** Handles TCP communication with the server application. */
     private Connection connection;
+
+    /** Utility class for creating and modifying CSV signal files. */
     private ManageFiles manageFiles = new ManageFiles();
+
+    /** Utility class for capturing signals using the BITalino device. */
     private BItalinoCapture bitalinoCapture = new BItalinoCapture();
 
+    /**
+     * Entry point of the Patient Application.
+     *
+     * @throws IOException if an I/O error occurs during connection initialization
+     */
     public static void main(String[] args) throws IOException {
         UI ui = new UI();
         ui.startConnection();
     }
 
+    /**
+     * Establishes a TCP connection with the server application.
+     *
+     * The method repeatedly prompts the patient user to enter an IP address and port until a valid connection is successfully created.
+     * Once connected, the UI identifies itself as a PATIENT application by sending a specific integer code.
+     * If the server confirms the identity, the pre-login menu is started.
+     *
+     * @throws RuntimeException if the connection cannot be established
+     */
     private void startConnection() {
         boolean connected = false;
 
@@ -64,6 +93,14 @@ public class UI {
             System.out.println("----------------------------------------------");        }
     }
 
+    /**
+     * Displays the pre-login menu for the user, allowing: Patient registration, Patient login and Application exit.
+     *
+     * This menu loops indefinitely until the patient logs in or exits.
+     * The option selected by the patient is forwarded to the server, and then the corresponding method is executed.
+     *
+     * @throws IOException if there is an error communicating with the server
+     */
     private void preLoggedMenu() throws IOException {
         do {
             int option = 0;
@@ -98,6 +135,14 @@ public class UI {
         } while(true);
     }
 
+    /**
+     * Displays the registration menu for new patients.
+     *
+     * The user enters email, full name, date of birth, and password.
+     * After server validation and doctor assignment, the patient is registered.
+     *
+     * @throws IOException if server communication fails
+     */
     private void registerMenu() throws IOException {
         System.out.println("""
         ╔════════════════════════════════════════╗
@@ -154,7 +199,19 @@ public class UI {
             registerMenu();
         }
     }
-
+    /**
+     * Handles the login workflow for an existing patient.
+     *
+     * <p>The method requests the patient's email and password, validates
+     * formats locally, and sends the credentials to the server for verification.
+     * If both email and password are confirmed by the server, the user is
+     * redirected to the main logged menu.</p>
+     *
+     * <p>If the email does not exist or the password is incorrect,
+     * the method returns to the previous menu.</p>
+     *
+     * @throws IOException if a communication error occurs during the login process
+     */
     private void loginMenu() throws IOException {
         do {
             System.out.println("""
@@ -204,6 +261,21 @@ public class UI {
         } while (true);
     }
 
+    /**
+     * Displays the main patient menu after a successful login.
+     *
+     * <p>The menu offers the following actions:</p>
+     * <ul>
+     *     <li>View personal information</li>
+     *     <li>View all reports associated with the patient</li>
+     *     <li>Create and send a new report to the server</li>
+     *     <li>Log out and return to the pre-login menu</li>
+     * </ul>
+     *
+     * <p>The menu remains active until the patient chooses to log out.</p>
+     *
+     * @throws IOException if an error occurs while retrieving data or sending requests to the server
+     */
     private void loggedMenu() throws IOException {
         Patient patient = connection.getReceiveViaNetwork().recievePatient();
         do{
@@ -245,6 +317,19 @@ public class UI {
         } while(true);
     }
 
+    /**
+     * Displays the patient's personal information: full name, email and date of birth.
+     *
+     * <p>The method requests the associated {@link User} object from the server
+     * in order to obtain the patient's email. If a doctor is assigned, the server
+     * also returns the doctor's full name, which is displayed to the user.</p>
+     *
+     * <p>The menu remains blocked until the user presses 0 to return to the
+     * main menu of the logged section.</p>
+     *
+     * @param patient the logged-in patient whose information will be shown
+     * @throws IOException if a communication problem occurs while retrieving data from the server
+     */
     private void seePatientInfo(Patient patient) throws IOException {
         User patientUser = connection.getReceiveViaNetwork().recieveUser();
         System.out.println("""
@@ -278,6 +363,21 @@ public class UI {
         } while (true);
     }
 
+    /**
+     * Displays all reports previously created by the patient.
+     *
+     * <p>If no reports exist, the user is informed and returned immediately
+     * to the main menu.</p>
+     *
+     * <p>When reports are available, they are sorted by date (most recent first)
+     * and printed with full details: report date, patient and doctor observations,
+     * and selected symptoms.</p>
+     *
+     * <p>The method waits for the user to press 0 before returning.</p>
+     *
+     * @param patient the patient whose reports will be displayed
+     * @throws IOException if data processing or reading from the server fails
+     */
     private void patientSeeReports(Patient patient) throws IOException {
         System.out.println("""
         ╔════════════════════════════════════════╗
@@ -319,6 +419,23 @@ public class UI {
         }
     }
 
+    /**
+     * Creates a new report for the given patient.
+     *
+     * <p>The method collects:</p>
+     * <ul>
+     *     <li>Current date as the report date</li>
+     *     <li>Patient's written observations</li>
+     *     <li>A variable-length list of symptoms chosen by the user</li>
+     *     <li>BITalino signals captured and stored inside a CSV file</li>
+     * </ul>
+     *
+     * <p>The created report is added to the patient's local report list,
+     * sent to the server, and the server's confirmation is displayed.</p>
+     *
+     * @param patient the patient who is creating the new report
+     * @throws IOException if file creation, signal capture or network communication fails
+     */
     private void createReport(Patient patient) throws IOException {
         System.out.println("""
         ╔════════════════════════════════════════╗
@@ -358,7 +475,6 @@ public class UI {
             }
         }
 
-
         String csvFilePath = manageFiles.createSignalsCSVFile(reportDate);
         System.out.println("-> CSV file created at: " + csvFilePath);
         System.out.println("----------------------------------------------");
@@ -376,6 +492,19 @@ public class UI {
         System.out.println("----------------------------------------------");
     }
 
+    /**
+     * Manages the interactive menu for capturing physiological signals using the BITalino device.
+     *
+     * <p>The user may repeatedly select one of the available {@link SignalType} values
+     * (EMG, ECG, EDA, ACC), and each captured signal is appended to the previously created
+     * CSV file using {@link ManageFiles#appendSignalToCSV(String, Signal)}.</p>
+     *
+     * <p>The capture process continues until the user decides to stop by selecting 0
+     * or by declining to capture more signals.</p>
+     *
+     * @param csvFilePath the path of the CSV file where captured signals will be appended
+     * @throws IOException if saving the signal data to the CSV file fails
+     */
     public void signalMenu(String csvFilePath) throws IOException {
         boolean continueCapturing = true;
         while (continueCapturing) {
@@ -422,6 +551,14 @@ public class UI {
         }
     }
 
+    /**
+     * Terminates the Patient Application cleanly.
+     *
+     * <p>The method prints a closing message, releases all network resources
+     * through {@link Connection#releaseResources()}, and exits the program.</p>
+     *
+     * <p>This method does not return, as it ends the entire application using {@code System.exit(0)}.</p>
+     */
     private void exitMenu() {
         System.out.println("""
                 ╔════════════════════════════════════════╗

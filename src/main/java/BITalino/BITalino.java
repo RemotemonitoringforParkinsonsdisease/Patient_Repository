@@ -1,5 +1,4 @@
 package BITalino;
-
 /**
  \mainpage
 
@@ -35,9 +34,7 @@ package BITalino;
  - press "Apply" and then "OK" in the bottom of the dialog;
  - under the API_BITALINO folder, select the "src" folder.
  - click on the test.java file with the right button of your mouse and select the “Run ‘test.main()’”.
-
  */
-
 
 import javax.bluetooth.RemoteDevice;
 import javax.microedition.io.Connector;
@@ -47,38 +44,57 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Vector;
 
-/// The %BITalino device class.
+/**
+ * Represents a BITalino device, allowing a Java application to connect, configure,
+ * start and stop acquisition, and read frames from the device.
+ *
+ * Each instance of this class manages its own Bluetooth connection to a
+ * BITalino device through the BlueCove library.
+ *
+ * The connection is opened using {@link #open(String, int)} and released with {@link #close()}.
+ */
 public class BITalino {
 
-    /// Array with the list of analog inputs to be acquired from the device (auxiliary variable)
+    /**
+     * List of analog channels selected for acquisition.
+     */
     private int[] analogChannels = null;
 
-    /// Number of bytes expected for a frame sent by the device (auxiliary variable)
+    /**
+     * Number of bytes expected in each frame sent from the device.
+     */
     private int number_bytes = 0;
 
-    /// Instance of the Bluetooth socket connection established with the BITalino device
+    /**
+     * Bluetooth socket connection established with the device.
+     */
     private StreamConnection hSocket = null;
 
-    /// Instance of the data stream with data coming from the BITalino device
+    /**
+     * Input data stream from the BITalino device.
+     */
     private DataInputStream iStream = null;
 
-    /// Instance of the data stream through which data can be sent to the BITalino device
+    /**
+     * Output data stream to the BITalino device.
+     */
     private DataOutputStream oStream = null;
 
     public BITalino() {
     }
 
+    /**
+     * Connects to a BITalino device using its Bluetooth MAC address.
+     *
+     * @param macAdd       the MAC address of the device ("xx:xx:xx:xx:xx:xx")
+     * @param samplingRate sampling rate in Hz (1, 10, 100 or 1000)
+     *
+     * @throws BITalinoException if the MAC address is invalid or sampling rate is incorrect
+     * @throws IllegalArgumentException if an invalid parameter is provided
+     * @throws IOException if connection cannot be established
+     * @throws SecurityException if permissions are insufficient
+     */
     public void open(String macAdd, int samplingRate) throws BITalinoException {
-        /** Connects to a %BITalino device.
-         * \param[in] macAdd The device Bluetooth MAC address ("xx:xx:xx:xx:xx:xx")
-         * \param[in] samplingRate Sampling rate in Hz. Accepted values are 1, 10, 100 or 1000 Hz. Default value is 1000 Hz.
-         * \exception BITalinoErrorTypes (BITalinoErrorTypes.MACADDRESS_NOT_VALID)
-         * \exception BITalinoErrorTypes (BITalinoErrorTypes.SAMPLING_RATE_NOT_DEFINED)
-         * \exception IllegalArgumentException
-         * \exception ConnectionNotFoundException
-         * \exception IOException
-         * \exception SecurityException
-         */
         if (macAdd.split(":").length > 1) {
             macAdd = macAdd.replace(":", "");
         }
@@ -98,7 +114,6 @@ public class BITalino {
 
         try {
             int variableToSend = 0;
-            // Configure sampling rate
 
             switch (samplingRate) {
                 case 1000:
@@ -123,14 +138,14 @@ public class BITalino {
         }
     }
 
+    /**
+     * Starts signal acquisition for the selected analog channels.
+     *
+     * @param anChannels array of channel indexes (0–5) to acquire
+     *
+     * @throws BITalinoException if channels are invalid or device is not connected
+     */
     public void start(int[] anChannels) throws Throwable {
-        /** Starts a signal acquisition from the device.
-         * \param[in] anChannels Set of channels to acquire. Accepted channels are 0...5 for inputs A1...A6.
-         * If this set is empty, no analog channels will be acquired.
-         * \remarks This method cannot be called during an acquisition.
-         * \exception BITalinoException (BITalinoErrorTypes.ANALOG_CHANNELS_NOT_VALID)
-         * \exception BITalinoException (BITalinoErrorTypes.BT_DEVICE_NOT_CONNECTED)
-         */
         analogChannels = anChannels;
         if (analogChannels.length > 6 | analogChannels.length == 0) {
             throw new BITalinoException(BITalinoErrorTypes.ANALOG_CHANNELS_NOT_VALID);
@@ -146,8 +161,6 @@ public class BITalino {
             int nChannels = analogChannels.length;
             if (nChannels <= 4) {
                 number_bytes = (int) Math.ceil(((float) 12 + (float) 10 * nChannels) / 8);
-
-
             } else {
                 number_bytes = (int) Math.ceil(((float) 52 + (float) 6 * (nChannels - 4)) / 8);
             }
@@ -157,14 +170,14 @@ public class BITalino {
                 throw new BITalinoException(BITalinoErrorTypes.BT_DEVICE_NOT_CONNECTED);
             }
         }
-
     }
 
+    /**
+     * Stops the ongoing signal acquisition.
+     *
+     * @throws BITalinoException if the device is not connected
+     */
     public void stop() throws BITalinoException {
-        /** Stops a signal acquisition.
-         * \remarks This method must be called only during an acquisition.
-         * \exception BITalinoException (BITalinoErrorTypes.BT_DEVICE_NOT_CONNECTED)
-         */
         try {
             Write(0);
         } catch (Exception e) {
@@ -172,10 +185,12 @@ public class BITalino {
         }
     }
 
+    /**
+     * Closes the connection to the device and releases all resources.
+     *
+     * @throws BITalinoException if the device is not connected or cannot be closed
+     */
     public void close() throws BITalinoException {
-        /** Disconnects from a %BITalino device. If an aquisition is running, it is stopped.
-         * \exception BITalinoException (BITalinoErrorTypes.BT_DEVICE_NOT_CONNECTED)
-         */
         try {
             hSocket.close();
             iStream.close();
@@ -186,15 +201,16 @@ public class BITalino {
         } catch (Exception e) {
             throw new BITalinoException(BITalinoErrorTypes.BT_DEVICE_NOT_CONNECTED);
         }
-
     }
 
+    /**
+     * Sends a raw command byte to the BITalino device.
+     *
+     * @param data byte representing the command
+     *
+     * @throws BITalinoException if communication is lost
+     */
     public void Write(int data) throws BITalinoException {
-        /**
-         * Send a command to BITalino
-         * \param[in] data Byte corresponding to the command to be sent to the %BITalino device
-         * \exception BITalinoException (BITalinoErrorTypes.LOST_COMMUNICATION)
-         */
         try {
             oStream.write(data);
             oStream.flush();
@@ -204,18 +220,21 @@ public class BITalino {
         }
     }
 
-
+    /**
+     * Decodes a raw byte buffer into a frame array.
+     *
+     * @param buffer the byte buffer read from the device
+     * @return an array containing the decoded frame(s)
+     *
+     * @throws IOException if reading fails
+     * @throws BITalinoException if decoding fails
+     */
     private Frame[] decode(byte[] buffer) throws IOException, BITalinoException {
-        /** Unpack a raw byte stream into a frames vector.
-         * \param[in] buffer Vector with the bytes read from the device.
-         * \return Vector of frames decoded frames.
-         * \exception BITalinoException (BITalinoErrorTypes.INCORRECT_DECODE)
-         */
         try {
             Frame[] frames = new Frame[1];
             int j = (number_bytes - 1), i = 0, CRC = 0, x0 = 0, x1 = 0, x2 = 0, x3 = 0, out = 0, inp = 0;
             CRC = (buffer[j - 0] & 0x0F) & 0xFF;
-            // check CRC
+
             for (int bytes = 0; bytes < number_bytes; bytes++) {
                 for (int bit = 7; bit > -1; bit--) {
                     inp = (buffer[bytes]) >> bit & 0x01;
@@ -229,11 +248,8 @@ public class BITalino {
                     x0 = inp ^ out;
                 }
             }
-            //if the message was correctly received, it starts decoding
+
             if (CRC == ((x3 << 3) | (x2 << 2) | (x1 << 1) | x0)) {
-
-                /*parse frames*/
-
                 frames[i] = new Frame();
                 frames[i].seq = (short) ((buffer[j - 0] & 0xF0) >> 4) & 0xf;
                 frames[i].digital[0] = (short) ((buffer[j - 1] >> 7) & 0x01);
@@ -241,7 +257,6 @@ public class BITalino {
                 frames[i].digital[2] = (short) ((buffer[j - 1] >> 5) & 0x01);
                 frames[i].digital[3] = (short) ((buffer[j - 1] >> 4) & 0x01);
 
-                /*parse buffer frame*/
                 switch (analogChannels.length - 1) {
 
                     case 5:
@@ -262,8 +277,6 @@ public class BITalino {
 
                         frames[i].analog[0] = (short) ((((buffer[j - 1] & 0xF) << 6) | ((buffer[j - 2] & 0XFC) >> 2)) & 0x3ff);
                 }
-
-
             } else {
                 frames[i] = new Frame();
                 frames[i].seq = -1;
@@ -274,14 +287,16 @@ public class BITalino {
         }
     }
 
+    /**
+     * Reads a given number of frames from the BITalino device.
+     *
+     * @param nSamples number of frames to read
+     * @return an array of acquired frames
+     *
+     * @throws BITalinoException if communication fails
+     */
     public Frame[] read(int nSamples) throws BITalinoException {
-        /** Reads acquisition frames from the device.
-         * This method returns when all requested frames are received from the device, or when a receive timeout occurs.
-         * \param[in] nSamples Number of frames that should be read from the device.
-         * \return Vector of frames obtained from the device.
-         * \remarks If a problem occurred, the size of the frames vector  is lower than the frames vector size. This method must be called only during an acquisition.
-         * \exception BITalinoException (BITalinoErrorTypes.LOST_COMMUNICATION)
-         */
+
         try {
             Frame[] frames = new Frame[nSamples];
             byte[] buffer = new byte[number_bytes];

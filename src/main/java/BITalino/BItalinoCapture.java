@@ -3,36 +3,41 @@ package BITalino;
 import POJOS.Signal;
 import POJOS.SignalType;
 
+/**
+ * Provides functionality for capturing physiological signals from a BITalino device.
+ * This class manages the connection, acquisition, and conversion of raw BITalino
+ * frames into {@link Signal} objects.
+ *
+ * A specific signal type (ECG, EMG, EDA, ACC) is mapped to a BITalino analog input
+ * channel, and a fixed number of samples are acquired and returned.
+ */
 public class BItalinoCapture {
     public BItalinoCapture() {
     }
 
+    /**
+     * Captures a physiological signal from a BITalino device according to the provided signal type.
+     * The method establishes a Bluetooth connection, starts acquisition on the appropriate channel,
+     * reads 100 samples, converts them into integer values, and returns a {@link Signal} object.
+     *
+     * @param type the type of physiological signal to capture (EMG, ECG, EDA, ACC)
+     * @return a {@link Signal} containing the captured values, or null if an error occurs
+     */
     public Signal captureBitalinoSignal(SignalType type) {
-        //TODO mirar excepciones posibles
         System.out.println("\nConnecting to BITalino...");
-        String mac = "BC:33:AC:AB:AE:E5";  //Cambiar por el nuestro
-        //String mac = "98:D3:91:FD:69:4F";  //Cambiar por el nuestro
+        String mac = "BC:33:AC:AB:AE:E5";
+        //String mac = "98:D3:91:FD:69:4F";
 
-        //Canal del BItalino real
         int channel = mapSignalTypeToChannel(type);
         Signal signal = new Signal(type);
+
         try {
-
             BITalino device = new BITalino();
-
-            //Abrir conexión
             device.open(mac, 100);
-
-            //Iniciar adquisición SOLO del canal elegido
             device.start(new int[]{channel});
+            System.out.println("-> Recording " + type + " signal...");
 
-            System.out.println("Recording " + type + " signal...");
-
-            //Lee 100 muestras (nuestro samplingRate)
             Frame[] frames = device.read(100);
-
-            //Guarda valores en la señal
-            //TODO revisar como pasar datos a enteros desde BITalino
             for (Frame frame : frames) {
                 int value = frame.analog[0];
                 signal.getValues().add(value);
@@ -41,26 +46,35 @@ public class BItalinoCapture {
             device.stop();
             device.close();
 
-            System.out.println("Signal captured successfully!\n");
+            System.out.println("-> Signal captured successfully!\n");
             return signal;
 
         } catch (Exception e) {
-            System.out.println("Error capturing " + type + " signal: " + e.getMessage());
-            e.printStackTrace();
+            System.out.println("-> Error capturing " + type + " signal: " + e.getMessage());
             return null;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
     }
 
-    //Los tipos de señal están asignados a los canales de la placa de bitalino
+    /**
+     * Maps a {@link SignalType} to the corresponding BITalino analog channel index.
+     *
+     * @param type the type of signal to map
+     * @return the BITalino channel index associated with the signal type
+     */
     private int mapSignalTypeToChannel(SignalType type) {
         switch (type) {
-            case EMG: return 0;
-            case ECG: return 1;
-            case EDA: return 2;
-            case ACC: return 3; //eje X, por ejemplo
-            default: return 444; //Gestionar esto
+            case EMG:
+                return 0;
+            case ECG:
+                return 1;
+            case EDA:
+                return 2;
+            case ACC:
+                return 3;
+            default:
+                throw new IllegalArgumentException("-> Unsupported SignalType: " + type);
         }
     }
 }
