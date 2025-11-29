@@ -144,7 +144,7 @@ public class UI {
                 connection.getSendViaNetwork().sendRegisteredPatient(registeredPatient);
                 loggedMenu();
             } else {
-                System.out.println("-> You cannot register until a doctor is available, sorry! ");
+                System.out.println("-> We don't have any doctor yet, you can't register, sorry! ");
                 System.out.println("----------------------------------------------");
             }
 
