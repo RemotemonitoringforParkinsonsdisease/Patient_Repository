@@ -350,8 +350,12 @@ public class UI {
             }
 
             Symptoms chosenSymptom = Symptoms.values()[choice-1];
-            selectedSymptoms.add(chosenSymptom);
-            System.out.println("-> " + chosenSymptom + " added.");
+            if (!selectedSymptoms.contains(chosenSymptom)) {
+                selectedSymptoms.add(chosenSymptom);
+                System.out.println("-> " + chosenSymptom + " added.");
+            } else {
+                System.out.println("-> This symptom: " + chosenSymptom + " is already added!");
+            }
         }
 
 
