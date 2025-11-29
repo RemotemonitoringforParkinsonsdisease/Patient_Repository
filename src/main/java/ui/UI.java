@@ -140,8 +140,13 @@ public class UI {
             } while (password == null || password.isEmpty());
 
             Patient registeredPatient = new Patient(password, fullName, dob);
-            connection.getSendViaNetwork().sendRegisteredPatient(registeredPatient);
-            loggedMenu();
+            if (connection.getReceiveViaNetwork().receiveString().equals("DOCTOR ASSIGNED")) {
+                connection.getSendViaNetwork().sendRegisteredPatient(registeredPatient);
+                loggedMenu();
+            } else {
+                System.out.println("-> You cannot register until a doctor is available, sorry! ");
+                System.out.println("----------------------------------------------");
+            }
 
         } else {
             System.out.println("-> This email is already associated with a patient! ");
