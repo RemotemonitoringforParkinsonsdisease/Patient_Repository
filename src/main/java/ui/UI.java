@@ -348,14 +348,13 @@ public class UI {
                 System.out.println("----------------------------------------------");
                 continue;
             }
-            //Accede a todos los valores del enum como un array (abajo)
-            //Resta 1 porque el menú empieza en 1 pero el array en 0
+
             Symptoms chosenSymptom = Symptoms.values()[choice-1];
             selectedSymptoms.add(chosenSymptom);
             System.out.println("-> " + chosenSymptom + " added.");
         }
 
-        //creamos el archivo de señales
+
         String csvFilePath = manageFiles.createSignalsCSVFile(reportDate);
         System.out.println("-> CSV file created at: " + csvFilePath);
         System.out.println("----------------------------------------------");
