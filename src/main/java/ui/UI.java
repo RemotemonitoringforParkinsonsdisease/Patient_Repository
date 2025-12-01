@@ -54,13 +54,14 @@ public class UI {
         while (!connected) {
             System.out.println("""
             ╔══════════════════════════════════════════════╗
-            ║          PATIENT APPLICATION - CONNECT       ║
+            ║         PATIENT APPLICATION - CONNECT        ║
             ║                                              ║
             ║   Please enter the server connection info    ║
             ╚══════════════════════════════════════════════╝
             """);
             String ipAddress = Utilities.readString("-> IP Address: ");
             int port = Utilities.readInteger("-> Port: ");
+            System.out.println("-> Waiting server app to start... ");
             try {
                 this.connection = new Connection(ipAddress, port);
                 connected = true;
