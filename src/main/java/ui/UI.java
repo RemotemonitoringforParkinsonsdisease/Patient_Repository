@@ -91,7 +91,8 @@ public class UI {
             }
         } catch (IOException e) {
             System.out.println("-> Error in communication once it was connected! ");
-            System.out.println("----------------------------------------------");        }
+            System.out.println("----------------------------------------------");
+        }
     }
 
     /**
