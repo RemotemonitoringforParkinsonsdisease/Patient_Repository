@@ -101,6 +101,7 @@ public class Utilities {
             return true;
         } else {
             System.out.println("-> Please follow the email format: example@example.com");
+            System.out.println("----------------------------------------------");
             return false;
         }
     }
