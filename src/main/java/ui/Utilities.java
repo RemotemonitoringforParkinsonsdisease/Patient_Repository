@@ -95,12 +95,12 @@ public class Utilities {
     public static boolean checkEmail(String email) {
         Pattern pattern = Pattern.compile("([a-z0-9]+(\\.?[a-z0-9])*)+@(([a-z]+)\\.([a-z]+))+");
         Matcher mather = pattern.matcher(email);
-        System.out.println("Checking email");
+        System.out.println("-> Checking email... ");
         if (mather.find()) {
-            System.out.println("email is valid");
+            System.out.println("-> Email valid! ");
             return true;
         } else {
-            System.out.println("Please follow the email format: example@example.com");
+            System.out.println("-> Please follow the email format: example@example.com");
             return false;
         }
     }
