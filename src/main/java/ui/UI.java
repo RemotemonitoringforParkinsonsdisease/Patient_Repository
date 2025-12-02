@@ -162,6 +162,7 @@ public class UI {
 
         connection.getSendViaNetwork().sendStrings(email);
         String serverResponse = connection.getReceiveViaNetwork().receiveString();
+        System.out.println(serverResponse);
 
         if (serverResponse.equals("EMAIL OK")) {
             System.out.println("-> Email accepted! ");
