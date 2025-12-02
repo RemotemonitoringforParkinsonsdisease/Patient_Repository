@@ -24,11 +24,22 @@ Before downloading the github repository locally, make sure you have the followi
 
 ## **Installation:**
 
+### In case you want to run the project throught Intelij:
+
   1. Clone the repository locally
 
   2. Build the project by: mvn clean install
 
-  3. Run the _UI_ class 
+  3. Run the _UI_ class
+
+### In case you only want to execute from the terminal:
+
+  1. Download the _Patient_Rep_jar_ folder located in the _out_ folder path
+
+  2. Now through your terminal use _cd_ and _ls_ commands to navigate throught your directories until you reach _Patient_Rep.jar_ file
+
+  3. Finally run the application using the command: java -jar Patient_Rep.jar
+ 
 
 ## **Application guide:**
 
