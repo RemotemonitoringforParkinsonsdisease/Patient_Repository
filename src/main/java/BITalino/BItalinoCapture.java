@@ -25,8 +25,8 @@ public class BItalinoCapture {
      */
     public Signal captureBitalinoSignal(SignalType type) {
         System.out.println("\nConnecting to BITalino...");
-        //String mac = "BC:33:AC:AB:AE:E5";
-        String mac = "98:D3:91:FD:69:4F";
+        String mac = "BC:33:AC:AB:AE:E5";
+        //String mac = "98:D3:91:FD:69:4F";
 
         int channel = mapSignalTypeToChannel(type);
         Signal signal = new Signal(type);
