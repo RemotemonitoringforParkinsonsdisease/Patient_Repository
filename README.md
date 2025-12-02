@@ -24,9 +24,14 @@ Before downloading the github repository locally, make sure you have the followi
 
 ## **Installation:**
 
-1. Clone the repository locally:
+  1. Clone the repository locally
 
-2. Build the project by: mvn clean install
+  2. Build the project by: mvn clean install
 
-3. Run the _UI_ class 
+  3. Run the _UI_ class 
 
+## **Application guide:**
+
+All the information on how to use the application step by step is available in the application manual document provided.
+
+[Download Patient Application Manual](URL_del_PDF)
