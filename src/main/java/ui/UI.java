@@ -167,31 +167,32 @@ public class UI {
         if (serverResponse.equals("EMAIL OK")) {
             System.out.println("-> Email accepted! ");
             System.out.println("----------------------------------------------");
-            String fullName;
-            do {
-                fullName = Utilities.readString("-> Enter your full name: ");
-                if (fullName == null || fullName.trim().isEmpty()) {
-                    System.out.println("-> Name cannot be empty! ");
-                    System.out.println("----------------------------------------------");
-                }
-            } while (fullName == null || fullName.trim().isEmpty());
-
-            LocalDate dob = Utilities.readDate("-> Enter your DOB: ");
-
-            String password;
-            do {
-                password = Utilities.readString("-> Enter your password: ");
-                if (password == null || password.isEmpty()) {
-                    System.out.println("-> Password cannot be empty! ");
-                    System.out.println("----------------------------------------------");
-                }
-            } while (password == null || password.isEmpty());
-
-            Patient registeredPatient = new Patient(password, fullName, dob);
             if (connection.getReceiveViaNetwork().receiveString().equals("DOCTOR ASSIGNED")) {
+                String fullName;
+                do {
+                    fullName = Utilities.readString("-> Enter your full name: ");
+                    if (fullName == null || fullName.trim().isEmpty()) {
+                        System.out.println("-> Name cannot be empty! ");
+                        System.out.println("----------------------------------------------");
+                    }
+                } while (fullName == null || fullName.trim().isEmpty());
+
+                LocalDate dob = Utilities.readDate("-> Enter your DOB: ");
+
+                String password;
+                do {
+                    password = Utilities.readString("-> Enter your password: ");
+                    if (password == null || password.isEmpty()) {
+                        System.out.println("-> Password cannot be empty! ");
+                        System.out.println("----------------------------------------------");
+                    }
+                } while (password == null || password.isEmpty());
+
+                Patient registeredPatient = new Patient(password, fullName, dob);
                 connection.getSendViaNetwork().sendRegisteredPatient(registeredPatient);
                 loggedMenu();
-            } else {
+            }
+             else {
                 System.out.println("-> We don't have any doctor yet, you can't register, sorry! ");
                 System.out.println("----------------------------------------------");
             }
@@ -199,7 +200,6 @@ public class UI {
         } else {
             System.out.println("-> This email is already associated with a patient! ");
             System.out.println("----------------------------------------------");
-            registerMenu();
         }
     }
     /**
