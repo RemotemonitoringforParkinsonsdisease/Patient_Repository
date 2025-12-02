@@ -486,7 +486,6 @@ public class UI {
         Report report = new Report(patient.getPatientId(), reportDate, patientObservations, "", selectedSymptoms, csvFilePath);
         patient.getReports().add(report);
         System.out.println("-> Report created:");
-        System.out.println(report);
         System.out.println("----------------------------------------------");
 
         connection.getSendViaNetwork().sendReport(report);
