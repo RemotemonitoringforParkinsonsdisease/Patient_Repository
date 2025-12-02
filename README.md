@@ -34,4 +34,4 @@ Before downloading the github repository locally, make sure you have the followi
 
 All the information on how to use the application step by step is available in the application manual document provided.
 
-[Download Patient Application Manual](URL_del_PDF)
+[Download Patient Application Manual](blob:https://github.com/06d8aa4e-fea0-43bf-85c7-7c1bb1776131)
